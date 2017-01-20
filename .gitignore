@@ -1,6 +1,10 @@
 # This built biz aint worth commiting bro
+<<<<<<< HEAD
+bin/js/
+=======
 bin/js/*.js
 bin/js/*.js.map
+>>>>>>> origin/master
 
 ## Node ##
 # Logs

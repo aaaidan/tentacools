@@ -75,14 +75,15 @@ class SimpleGame {
         });
     }
     preload() {
-		// this.game.load.image("ball1", "assets/ball-1.png");
-		// this.game.load.image("ball2", "assets/ball-2.png");
-		// this.game.load.image("ball3", "assets/ball-3.png");
-
-		// this.game.load.image("mouth", "assets/mouth.png");
+		this.game.load.image('background','assets/debug-grid-1920x1920.png');
     }
 
     create() {
+
+    	this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
+
+    	this.game.world.setBounds(0, 0, 1920, 1920);		
+
         this.mouth = this.game.add.sprite(this.game.width/2, this.game.height/2, "mouth");
 		this.mouth.bringToTop();
 
@@ -92,6 +93,7 @@ class SimpleGame {
 		// this.arm3.scale.set(0.1);
 
         this.game.physics.startSystem(Phaser.Physics.P2JS);
+		this.game.camera.follow(this.mouth);
 
         // Enabled physics on mouth
         this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
