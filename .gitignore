@@ -1,5 +1,6 @@
 # This built biz aint worth commiting bro
-bin
+bin/js/*.js
+bin/js/*.js.map
 
 ## Node ##
 # Logs
