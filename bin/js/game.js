@@ -3,25 +3,87 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var maxForce = 20000; // who knows
+var maxForce = 2000; // who knows
+var SHOW_PHYSICS_DEBUG = false;
+var Arm = (function () {
+    function Arm(game, spriteName) {
+        var _this = this;
+        this.game = game;
+        this.balls = [];
+        this.sprite = new Phaser.Group(this.game);
+        var segmentLength = 10;
+        var totalMass = 1;
+        var ballCount = 10;
+        for (var i = 0; i < ballCount; i++) {
+            var ball = this.game.add.sprite(0, i * segmentLength, spriteName);
+            ball.scale.set(1 / (1 + i / (ballCount - 1)));
+            this.balls.push(ball);
+        }
+        this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);
+        var lastBall = null;
+        this.balls.forEach(function (b) {
+            b.body.mass = totalMass / ballCount;
+            b.body.collideWorldBounds = false;
+            if (lastBall) {
+                _this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);
+                _this.game.physics.p2.createRotationalSpring(b, lastBall, 0, 80, 4);
+            }
+            lastBall = b;
+        });
+    }
+    Arm.prototype.getBase = function () {
+        return this.balls[0].body;
+    };
+    Arm.prototype.attachTo = function (body, rotation) {
+        this.game.physics.p2.createRevoluteConstraint(body, [0, 0], this.getBase(), [0, 0], maxForce);
+        var USELESS = 0; // setting rest rotation in constructor doesn't work properly for some mysterious reason
+        var rotationSpring = this.game.physics.p2.createRotationalSpring(body, this.getBase(), USELESS, 120, 5);
+        rotationSpring.data.restAngle = rotation;
+    };
+    return Arm;
+}());
 /// <reference path="../tsd/phaser.d.ts"/>
 var SimpleGame = (function () {
     function SimpleGame() {
         this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
-            create: this.create, preload: this.preload, update: this.update
+            create: this.create, preload: this.preload, update: this.update, forEachArm: this.forEachArm
         });
     }
     SimpleGame.prototype.preload = function () {
-        this.game.load.image("decepticon", "square.jpg");
+        this.game.load.image("decepticon", "assets/square.jpg");
+        this.game.load.image("ball1", "assets/ball-1.png");
+        this.game.load.image("ball2", "assets/ball-2.png");
+        this.game.load.image("ball3", "assets/ball-3.png");
+        this.game.load.image("arm1", "assets/tentacool-01.png");
+        this.game.load.image("arm2", "assets/tentacool-02.png");
+        this.game.load.image("arm3", "assets/tentacool-03.png");
+        this.game.load.image("mouth", "assets/mouth.png");
+    };
+    SimpleGame.prototype.forEachArm = function (cb) {
+        cb(this.arm1);
+        cb(this.arm2);
+        cb(this.arm3);
     };
     SimpleGame.prototype.create = function () {
-        this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "decepticon");
-        this.arm1 = this.game.add.sprite(this.game.width / 2, this.game.height * 0.1, "decepticon");
-        this.arm2 = this.game.add.sprite(this.game.width * 0.1, this.game.height * 0.8, "decepticon");
-        this.arm3 = this.game.add.sprite(this.game.width * 0.9, this.game.height * 0.8, "decepticon");
+        var _this = this;
+        this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "mouth");
+        this.arm1 = this.game.add.sprite(this.game.width / 2, this.game.height * 0.1, "arm1");
+        this.arm2 = this.game.add.sprite(this.game.width * 0.1, this.game.height * 0.8, "arm2");
+        this.arm3 = this.game.add.sprite(this.game.width * 0.9, this.game.height * 0.8, "arm3");
+        this.mouth.bringToTop();
+        // this.mouth.scale.set(0.1);
+        // this.arm1.scale.set(0.1);
+        // this.arm2.scale.set(0.1);
+        // this.arm3.scale.set(0.1);
         this.game.physics.startSystem(Phaser.Physics.P2JS);
         // Enabled physics on our sprites
-        this.game.physics.p2.enable([this.mouth, this.arm1, this.arm2, this.arm3]);
+        this.game.physics.p2.enable([this.mouth, this.arm1, this.arm2, this.arm3], SHOW_PHYSICS_DEBUG);
+        // setup behaviour of individual bits
+        this.mouth.body.mass = 5;
+        this.forEachArm(function (a) {
+            a.body.collideWorldBounds = false;
+            // a.body.clearShapes(); // remove the default rectangle
+        });
         // Make our one body motionless
         // this.mouth.body.static = true;
         // Now create a sprite between our two bodies, parameters are rest length, stiffness and damping
@@ -32,41 +94,62 @@ var SimpleGame = (function () {
         // var sp1 = this.game.physics.p2.createSpring(this.mouth, this.arm1, 100, 5, 0.2);
         // var sp2 = this.game.physics.p2.createSpring(this.mouth, this.arm2, 100, 5, 0.2);
         // var sp3 = this.game.physics.p2.createSpring(this.mouth, this.arm3, 100, 5, 0.2);
-        this.j1 = this.game.physics.p2.createRevoluteConstraint(this.mouth, [0, 0], this.arm1, [0, 150], maxForce);
-        this.j2 = this.game.physics.p2.createRevoluteConstraint(this.mouth, [0, 0], this.arm2, [0, 150], maxForce);
-        this.j3 = this.game.physics.p2.createRevoluteConstraint(this.mouth, [0, 0], this.arm3, [0, 150], maxForce);
-        this.cursors = this.game.input.keyboard.createCursorKeys();
+        var setupRevoluteConstraints = function () {
+            _this.j1 = _this.game.physics.p2.createRevoluteConstraint(_this.mouth, [0, 0], _this.arm1, [0, 150], maxForce);
+            _this.j2 = _this.game.physics.p2.createRevoluteConstraint(_this.mouth, [0, 0], _this.arm2, [0, 150], maxForce);
+            _this.j3 = _this.game.physics.p2.createRevoluteConstraint(_this.mouth, [0, 0], _this.arm3, [0, 150], maxForce);
+            _this.j1.setLimits(2 * Math.PI / 3 * 0 - 0.2, 2 * Math.PI / 3 * 0 + 0.2);
+            _this.j2.setLimits(2 * Math.PI / 3 * 1 - 0.2, 2 * Math.PI / 3 * 1 + 0.2);
+            _this.j3.setLimits(2 * Math.PI / 3 * 2 - 0.2, 2 * Math.PI / 3 * 2 + 0.2);
+        };
+        setupRevoluteConstraints();
+        var setupCursors = function () {
+            _this.cursors = _this.game.input.keyboard.createCursorKeys();
+            _this.cursors2 = {
+                left: _this.game.input.keyboard.addKey(Phaser.Keyboard.A),
+                right: _this.game.input.keyboard.addKey(Phaser.Keyboard.D),
+                up: _this.game.input.keyboard.addKey(Phaser.Keyboard.W),
+                down: _this.game.input.keyboard.addKey(Phaser.Keyboard.S),
+            };
+            _this.cursors3 = {
+                left: _this.game.input.keyboard.addKey(Phaser.Keyboard.J),
+                right: _this.game.input.keyboard.addKey(Phaser.Keyboard.L),
+                up: _this.game.input.keyboard.addKey(Phaser.Keyboard.I),
+                down: _this.game.input.keyboard.addKey(Phaser.Keyboard.K),
+            };
+        };
+        setupCursors();
+        var setupNoodlyAppendage = function (imageName, rotation) {
+            _this.a1 = new Arm(_this.game, imageName);
+            // this.a1.sprite.position.set( 100,100 );
+            _this.game.world.add(_this.a1.sprite);
+            _this.a1.attachTo(_this.mouth.body, rotation);
+        };
+        setupNoodlyAppendage("ball1", 2 * Math.PI * (0 / 3));
+        setupNoodlyAppendage("ball2", 2 * Math.PI * (1 / 3));
+        setupNoodlyAppendage("ball3", 2 * Math.PI * (2 / 3));
+        window["game"] = this;
     };
     SimpleGame.prototype.update = function () {
-        var FORCE = 200;
-        if (this.cursors.left.isDown) {
-            this.arm1.body.force.x = -FORCE;
+        var FORCE = 300;
+        var ROTATE_FORCE = 10;
+        function forceBody(arm, keys, forceAmt) {
+            if (keys.left.isDown) {
+                arm.body.force.x = -forceAmt;
+            }
+            else if (keys.right.isDown) {
+                arm.body.force.x = forceAmt;
+            }
+            if (keys.up.isDown) {
+                arm.body.force.y = -forceAmt;
+            }
+            else if (keys.down.isDown) {
+                arm.body.force.y = forceAmt;
+            }
         }
-        else if (this.cursors.right.isDown) {
-            this.arm1.body.force.x = FORCE;
-        }
-        if (this.cursors.up.isDown) {
-            this.arm1.body.force.y = -FORCE;
-        }
-        else if (this.cursors.down.isDown) {
-            this.arm1.body.force.y = FORCE;
-        }
-        // if (this.cursors.left.isDown)
-        // {
-        // 	this.arm2.body.moveLeft(400);
-        // }
-        // else if (this.cursors.right.isDown)
-        // {
-        // 	this.arm2.body.moveRight(400);
-        // }
-        // if (this.cursors.up.isDown)
-        // {
-        // 	this.arm2.body.moveUp(400);
-        // }
-        // else if (this.game.input.
-        // {
-        // 	this.arm2.body.moveDown(400);
-        // }
+        forceBody(this.arm1, this.cursors, FORCE);
+        forceBody(this.arm2, this.cursors2, FORCE);
+        forceBody(this.arm3, this.cursors3, FORCE);
     };
     return SimpleGame;
 }());
