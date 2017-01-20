@@ -9,6 +9,8 @@ class SimpleGame {
 	arm3: Phaser.Sprite;
 
 	cursors: Phaser.CursorKeys;
+	cursors2: Phaser.CursorKeys;
+	cursors3: Phaser.CursorKeys;
 
 	j1: Phaser.Physics.P2.RevoluteConstraint;
 	j2: Phaser.Physics.P2.RevoluteConstraint;
@@ -49,29 +51,53 @@ class SimpleGame {
 		this.j2 = this.game.physics.p2.createRevoluteConstraint( this.mouth, [0,0], this.arm2, [0,150], maxForce );
 		this.j3 = this.game.physics.p2.createRevoluteConstraint( this.mouth, [0,0], this.arm3, [0,150], maxForce );
 
+		this.j1.setLimits(0 - 0.2, 0 + 0.2);
+		this.j2.setLimits(2*Math.PI / 3 - 0.2, 2 * Math.PI / 3 + 0.2);
+		this.j3.setLimits(2*Math.PI / 3 * 2 - 0.2, 2*Math.PI / 3 * 2 + 0.2);
+		// this.j2.setLimits(-0.2, 0.2);
+		// this.j3.setLimits(-0.2, 0.2);
+
 		this.cursors = this.game.input.keyboard.createCursorKeys();
+		this.cursors2 = {
+			left: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
+			right: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
+			up: this.game.input.keyboard.addKey(Phaser.Keyboard.W),
+			down: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
+		}
+		this.cursors3 = {
+			left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
+			right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
+			up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
+			down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
+		}
     }
 
 	update() {
-		const FORCE = 200;
+		const FORCE = 300;
 
-		if (this.cursors.left.isDown)
-		{
-			this.arm1.body.force.x = -FORCE;
-		}
-		else if (this.cursors.right.isDown)
-		{
-			this.arm1.body.force.x = FORCE;
-		}
+		function moveBody(arm, keys) {
+			if (keys.left.isDown)
+			{
+				arm.body.force.x = -FORCE;
+			}
+			else if (keys.right.isDown)
+			{
+				arm.body.force.x = FORCE;
+			}
 
-		if (this.cursors.up.isDown)
-		{
-			this.arm1.body.force.y = -FORCE;
-		}
-		else if (this.cursors.down.isDown)
-		{
-			this.arm1.body.force.y = FORCE;
-		}
+			if (keys.up.isDown)
+			{
+				arm.body.force.y = -FORCE;
+			}
+			else if (keys.down.isDown)
+			{
+				arm.body.force.y = FORCE;
+			}
+		} 
+
+		moveBody(this.arm1, this.cursors);
+		moveBody(this.arm2, this.cursors2);
+		moveBody(this.arm3, this.cursors3);
 
 		
 		// if (this.cursors.left.isDown)
