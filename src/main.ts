@@ -2,7 +2,7 @@
 
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = false;
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 class Arm {
 
@@ -15,6 +15,7 @@ class Arm {
 	constructor(game:Phaser.Game, spriteName:String) {
 		this.game = game;
 		this.balls = [];
+		this.springs = [];
 		this.sprite = new Phaser.Group(this.game);
 
 		const segmentLength = 10;
@@ -71,7 +72,7 @@ class SimpleGame {
 
     constructor() {
         this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
-            create: this.create, preload: this.preload, update: this.update, forEachArm: this.forEachArm
+            create: this.create, preload: this.preload, update: this.update
         });
     }
     preload() {
