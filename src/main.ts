@@ -72,6 +72,9 @@ class SimpleGame {
     preload() {
         this.game.load.image("decepticon", "assets/square.jpg");
 
+		this.game.load.image('background','assets/debug-grid-1920x1920.png');
+
+
 		this.game.load.image("ball1", "assets/ball-1.png");
 		this.game.load.image("ball2", "assets/ball-2.png");
 		this.game.load.image("ball3", "assets/ball-3.png");
@@ -89,6 +92,11 @@ class SimpleGame {
 	}
 
     create() {
+
+    	this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
+
+    	this.game.world.setBounds(0, 0, 1920, 1920);		
+
         this.mouth = this.game.add.sprite(this.game.width/2, this.game.height/2, "mouth");
         this.arm1 = this.game.add.sprite(this.game.width/2, this.game.height * 0.1, "arm1");
 		this.arm2 = this.game.add.sprite(this.game.width * 0.1, this.game.height * 0.8, "arm2");
@@ -102,6 +110,7 @@ class SimpleGame {
 		// this.arm3.scale.set(0.1);
 
         this.game.physics.startSystem(Phaser.Physics.P2JS);
+		this.game.camera.follow(this.mouth);
 
         // Enabled physics on our sprites
         this.game.physics.p2.enable([this.mouth, this.arm1, this.arm2, this.arm3], SHOW_PHYSICS_DEBUG);
