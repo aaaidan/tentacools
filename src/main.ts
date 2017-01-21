@@ -56,14 +56,14 @@ class Arm {
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 
-	constructor(game: Phaser.Game, spriteName: String, armNumber: number, total: number) {
+	constructor(game: Phaser.Game, armIndex: number) {
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
 		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
-		const angle = Math.PI * 2 * (armNumber / total);
+		const angle = Math.PI * 2 * (armIndex / armsTotal);
 		const segmentLength = 10;
 		const totalMass = 1;
 		const segmentCount = 20;
@@ -72,7 +72,7 @@ class Arm {
 			let x = Math.cos(angle) * i * segmentLength;
 			let y = Math.sin(angle) * i * segmentLength;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
-			ball.tint = armNumber / total * 0x00ffff + 1 /armNumber / total * 0xff0000;
+			ball.tint = armIndex / armsTotal * 0x00ffff + 1 /armIndex / armsTotal * 0xff0000;
 			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
 			this.balls.push(ball);
 		}
@@ -134,14 +134,6 @@ class SimpleGame {
 	game: Phaser.Game;
 	mouth: Phaser.Sprite;
 
-	cursors: Phaser.CursorKeys;
-	cursors2: Phaser.CursorKeys;
-	cursors3: Phaser.CursorKeys;
-
-	j1: Phaser.Physics.P2.RevoluteConstraint;
-	j2: Phaser.Physics.P2.RevoluteConstraint;
-	j3: Phaser.Physics.P2.RevoluteConstraint;
-
 	armList: Arm[];
 	keyList = [];
 
@@ -152,7 +144,7 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
-		this.game.load.image('segment', 'assets/segment.png');
+	//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
 	create() {
@@ -163,11 +155,6 @@ class SimpleGame {
 
 		this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "mouth");
 		this.mouth.bringToTop();
-
-		// this.mouth.scale.set(0.1);
-		// this.arm1.scale.set(0.1);
-		// this.arm2.scale.set(0.1);
-		// this.arm3.scale.set(0.1);
 
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
@@ -215,15 +202,15 @@ class SimpleGame {
 		}
 		setupCursors();
 
-		var createNoodlyAppendage = (imageName, rotation, armNumber, total) => {
-			var arm = new Arm(this.game, imageName, armNumber, total);
+		var createNoodlyAppendage = (armIndex) => {
+			var arm = new Arm(this.game, armIndex);
 			this.game.world.add(arm.sprite);
-			arm.attachTo(this.mouth.body, rotation);
+			arm.attachTo(this.mouth.body, 2 * Math.PI * (armIndex / armsTotal));
 			return arm;
 		}
 		this.armList = [];
 		for (let a = 0; a < armsTotal; ++a) {
-			this.armList[a] = createNoodlyAppendage("arm" + a + 1, 2 * Math.PI * (a / armsTotal), a, armsTotal);
+			this.armList[a] = createNoodlyAppendage(a);
 		}
 
 		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
