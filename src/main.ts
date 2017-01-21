@@ -50,7 +50,7 @@ class Arm {
 	balls: Phaser.Sprite[];
 	game: Phaser.Game;
 	tip: Phaser.Sprite;
-	springs: any[];
+	springs: p2.RotationalSpring[];
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 	constructor(game:Phaser.Game, spriteName:String) {
@@ -64,7 +64,7 @@ class Arm {
 
 		const segmentLength = 10;
 		const totalMass = 1;
-		const segmentCount = 15;
+		const segmentCount = 20;
 		for (var i=0; i<segmentCount; i++) {
 			var ball:Phaser.Sprite = this.game.add.sprite(0, i * segmentLength, spriteName);
 			ball.scale.set( 1 / (1 + i/(segmentCount-1)) );
@@ -92,13 +92,11 @@ class Arm {
 		stiffness.addListener((value) => {
 			this.springs.forEach( s => {
 				s.data.stiffness = value;
-				console.log("stiff", value, this.id);
 			});
 		});
 		damping.addListener((value) => {
 			this.springs.forEach( s => {
-				s.data.damping = value;
-				console.log("damp", value, this.id);
+				s.damping = value;
 			});
 		});
 		armLengthStiffness.addListener( value => {
