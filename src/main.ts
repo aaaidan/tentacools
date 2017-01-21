@@ -32,7 +32,7 @@ class Arm {
 		var lastBall:Phaser.Sprite = null;
 		this.balls.forEach( b => {
 			b.body.mass = totalMass / ballCount;
-			b.body.collideWorldBounds = false;			
+			// b.body.collideWorldBounds = true;			
 			if (lastBall) {
 				this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
 				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, 80, 15 );
@@ -130,6 +130,43 @@ class SimpleGame {
 		this.a3 = createNoodlyAppendage("ball3", 2*Math.PI * (2/3) );
 		
 		this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
+
+		// Collision stuff
+		this.game.physics.p2.setImpactEvents(true);
+
+		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var starfishCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		this.game.physics.p2.updateBoundsCollisionGroup();
+		
+		var allFood = this.game.add.group();
+		allFood.enableBody = true;
+		allFood.physicsBodyType = Phaser.Physics.P2JS;
+
+		for (var i = 0; i < 200; i++)
+		{
+			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
+			food.body.setRectangle(40, 40);
+			food.body.setCollisionGroup(foodCollisionGroup);
+
+			food.body.collides([foodCollisionGroup, starfishCollisionGroup]);
+		}
+
+		var foodHit = (playerBody, foodBody) => {
+			foodBody.sprite.alpha -= 0.1;
+		};
+
+		for (var i = 0; i < this.a1.balls.length; i++)
+		{
+			this.a1.balls[i].body.setCollisionGroup(starfishCollisionGroup);
+			this.a2.balls[i].body.setCollisionGroup(starfishCollisionGroup);
+			this.a3.balls[i].body.setCollisionGroup(starfishCollisionGroup);
+
+			this.a1.balls[i].body.collides(foodCollisionGroup, foodHit);		
+			this.a2.balls[i].body.collides(foodCollisionGroup, foodHit);
+			this.a3.balls[i].body.collides(foodCollisionGroup, foodHit);	
+		}
+
+		//End collision stuff
 
 		window["game"] = this;
     }
