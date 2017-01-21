@@ -70,6 +70,14 @@ class SimpleGame {
 	preload() {
 		this.game.load.image('background', 'assets/background-tile.png');
 		this.game.load.image('segment', 'assets/ball.png');
+		this.game.load.image('eyeball-base', 'assets/eyeball-base.png');
+		this.game.load.image('eyeball-iris', 'assets/eyeball-iris.png');
+		this.game.load.image('eyeball-highlight', 'assets/eyeball-highlight.png');
+		this.game.load.image('mouth-closed', 'assets/mouth-closed.png');
+		this.game.load.image('mouth-bite0', 'assets/mouth-bite0.png');
+		this.game.load.image('mouth-bite1', 'assets/mouth-bite1.png');
+		this.game.load.image('mouth-bite2', 'assets/mouth-bite2.png');
+
 		this.game.load.image('food', 'assets/food.gif');
 		this.game.load.image('shell', 'assets/shell.gif');
 		this.game.load.image('energy', 'assets/energy.gif')
@@ -87,10 +95,28 @@ class SimpleGame {
 
 		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
-		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
-		this.mouth.bringToTop();
-		this.mouth.scale.set(0.6);
+		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
+		this.mouth.scale.set(0.65);
 
+		// add eyes
+		const eyeDistance = 50;
+		for(var i=0; i<3; i++) {
+			// i eye captain
+			let x = Math.sin( 2*Math.PI * (i/3) ) * eyeDistance;
+			let y = Math.cos( 2*Math.PI * (i/3) ) * eyeDistance;
+			console.log(`eye ${i}, ${x}:${y}`);
+			let eye = new Eye(this.game, x, y);
+			eye.attach(this.mouth);
+		}
+		
+		// add mouth-lips
+		let mouthLips = this.game.make.sprite(0,0, "mouth-bite1");
+		this.mouth.addChild(mouthLips);
+		window["mouth"] = mouthLips;
+		setTimeout(() => {
+			mouthLips.body.removeFromWorld();
+		},0);
+		
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
 
@@ -253,7 +279,7 @@ class SimpleGame {
 
 		// Hide title screen after a while
 		// Feel free to delete this or move it somewhere else somehow
-		if (this.title && this.game.time.now > 5000) {
+		if (this.title && this.game.time.now > 1000) {
 			this.title.alpha -= 0.05;
 			if (this.title.alpha < 0) {
 				this.game.world.removeChild(this.title);

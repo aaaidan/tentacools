@@ -5,7 +5,6 @@ class Food {
     // var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 	// food.body.setRectangle(40, 40);
 	// food.body.setCollisionGroup(foodCollisionGroup);
-
 	// food.body.collides([foodCollisionGroup, starfishCollisionGroup]);
     }
 
