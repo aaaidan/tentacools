@@ -17,7 +17,7 @@ class Arm {
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 
-	constructor(game: Phaser.Game, armIndex: number) {
+	constructor(game: Phaser.Game, armIndex: number, startX: number, startY: number) {
 		this.armIndex = armIndex;
 		this.game = game;
 		this.balls = [];
@@ -33,8 +33,8 @@ class Arm {
 		const tintColor:number = armColors[armIndex % armColors.length];
 
 		for (var i = 0; i < segmentCount; i++) {
-			let x = Math.cos(angle) * i * segmentLength + game.world.centerX;
-			let y = Math.sin(angle) * i * segmentLength + game.world.centerY;
+			let x = Math.cos(angle) * i * segmentLength + startX;
+			let y = Math.sin(angle) * i * segmentLength + startY;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
 			ball.tint = Phaser.Color.interpolateColor(0xffffff, tintColor, segmentCount, i);
 			ball.scale.set(0.4 / (1 + (i / (segmentCount - 1))*1.5 ));
