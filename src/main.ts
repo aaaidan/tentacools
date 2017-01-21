@@ -5,13 +5,14 @@ const SHOW_PHYSICS_DEBUG = true || true;
 
 declare const dat: any;
 const gui = new dat.GUI();
-const armsTotal = 5;
-
+const armsTotal = 3;
+// const foodCount = 200;
+const foodCount = 0;
 
 var tweaks = {
 	stiffness: 10,
 	damping: 500,
-	mouthMass: 25,
+	mouthMass: 30,
 	tentacleForce: 300,
 	armLengthStiffness: 30,
 	armLengthRelaxation: 10  // 35?
@@ -120,7 +121,9 @@ class SimpleGame {
 		var createNoodlyAppendage = (armIndex) => {
 			var arm = new Arm(this.game, armIndex);
 			this.game.world.add(arm.sprite);
-			arm.attachTo(this.mouth.body, 2 * Math.PI * (armIndex / armsTotal));
+			let appendageRotation = 2 * Math.PI * (armIndex / armsTotal);
+			console.log(`Attaching arm ${armIndex} at ${appendageRotation}`);
+			arm.attachTo(this.mouth.body, appendageRotation);
 			return arm;
 		}
 		this.armList = [];
@@ -128,6 +131,7 @@ class SimpleGame {
 			this.armList[a] = createNoodlyAppendage(a);
 		}
 
+		// this.mouth.body.static = true;
 		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
 
 		// Collision stuff
@@ -141,7 +145,7 @@ class SimpleGame {
 		allFood.enableBody = true;
 		allFood.physicsBodyType = Phaser.Physics.P2JS;
 
-		for (var i = 0; i < 200; i++)
+		for (var i = 0; i < foodCount; i++)
 		{
 			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(40, 40);
