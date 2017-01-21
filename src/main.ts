@@ -48,8 +48,8 @@ extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
 var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
 extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
-function setPivotCenter(image:Phaser.Image) {
-	image.pivot.set( image.width/2, image.height/2 );
+function setPivotCenter(image: Phaser.Image) {
+	image.pivot.set(image.width / 2, image.height / 2);
 }
 
 class SimpleGame {
@@ -59,7 +59,7 @@ class SimpleGame {
 
 	mouth: Phaser.Sprite;
 	mouthLips: Phaser.Image;
-	eyes:Eye[];
+	eyes: Eye[];
 	armList: Arm[];
 
 	keyList = [];
@@ -112,24 +112,24 @@ class SimpleGame {
 		// add eyes
 		const eyeDistance = 50;
 		this.eyes = [];
-		for(var i=0; i<3; i++) {
+		for (var i = 0; i < 3; i++) {
 			// i eye captain
-			let x = Math.sin( 2*Math.PI * (i/3) ) * eyeDistance;
-			let y = Math.cos( 2*Math.PI * (i/3) ) * eyeDistance;
+			let x = Math.sin(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
+			let y = Math.cos(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
 			console.log(`eye ${i}, ${x}:${y}`);
 			let eye = new Eye(this.game, x, y);
 			eye.attach(this.mouth);
 			this.eyes.push(eye);
 		}
-		
+
 		// add mouth-lips
-		this.mouthLips = this.game.make.image(0,0, "mouth-bite1");
+		this.mouthLips = this.game.make.image(0, 0, "mouth-bite1");
 		setPivotCenter(this.mouthLips);
 		this.mouth.addChild(this.mouthLips);
 
 		window["mouth"] = this.mouthLips; // for in-browser debug
 		window["eyes"] = this.eyes;  // for in-browser debug
-		
+
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
 
@@ -352,7 +352,7 @@ class SimpleGame {
 		}
 
 		this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
-		this.eyes.forEach(e => e.update() );
+		this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
 
 		this.playerEnergy.decreaseEnergy(1);
