@@ -3,25 +3,27 @@
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = false;
 
-declare const dat:any;
+declare const dat: any;
 const gui = new dat.GUI();
+const armsTotal = 5;
+
 
 var tweaks = {
 	stiffness: 10,
 	damping: 500,
 	mouthMass: 25,
 	tentacleForce: 300,
-	armLengthStiffness: 30, 
+	armLengthStiffness: 30,
 	armLengthRelaxation: 10  // 35?
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
 	guiParam.___changeCallbacks___ = [];
-	guiParam.addListener = (function(callback) {
+	guiParam.addListener = (function (callback) {
 		this.___changeCallbacks___.push(callback);
 	}).bind(guiParam);
-	guiParam.onChange((function(val) {
-		this.___changeCallbacks___.forEach(cb => cb(val) );
+	guiParam.onChange((function (val) {
+		this.___changeCallbacks___.forEach(cb => cb(val));
 	}).bind(guiParam));
 }
 
@@ -53,6 +55,7 @@ class Arm {
 	springs: any[];
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
+
 	constructor(game: Phaser.Game, spriteName: String, armNumber: number, total: number) {
 		this.game = game;
 		this.balls = [];
@@ -75,42 +78,42 @@ class Arm {
 		this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);
 		this.tip = this.balls[this.balls.length - 1];
 
-		var lastBall:Phaser.Sprite = null;
-		this.balls.forEach( b => {
+		var lastBall: Phaser.Sprite = null;
+		this.balls.forEach(b => {
 			b.body.mass = totalMass / segmentCount;
-			b.body.collideWorldBounds = false;			
+			b.body.collideWorldBounds = false;
 
 			if (lastBall) {
-				var hinge = this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
+				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);
 				// hinge.setStiffness(armLengthStiffness);
 				// hinge.setRelaxation(armLengthRelaxation);
 				this.hinges.push(hinge);
 
-				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, tweaks.stiffness, tweaks.damping );
+				var spring = this.game.physics.p2.createRotationalSpring(b, lastBall, 0, tweaks.stiffness, tweaks.damping);
 				this.springs.push(spring);
 			}
 			lastBall = b;
 		});
 
 		stiffness.addListener((value) => {
-			this.springs.forEach( s => {
+			this.springs.forEach(s => {
 				s.data.stiffness = value;
 				console.log("stiff", value, this.id);
 			});
 		});
 		damping.addListener((value) => {
-			this.springs.forEach( s => {
+			this.springs.forEach(s => {
 				s.data.damping = value;
 				console.log("damp", value, this.id);
 			});
 		});
-		armLengthStiffness.addListener( value => {
-			this.hinges.forEach( h => {
+		armLengthStiffness.addListener(value => {
+			this.hinges.forEach(h => {
 				h.setStiffness(value);
 			})
 		});
-		armLengthRelaxation.addListener( value => {
-			this.hinges.forEach( h => {
+		armLengthRelaxation.addListener(value => {
+			this.hinges.forEach(h => {
 				h.setRelaxation(value);
 			})
 		});
@@ -140,9 +143,8 @@ class SimpleGame {
 	j2: Phaser.Physics.P2.RevoluteConstraint;
 	j3: Phaser.Physics.P2.RevoluteConstraint;
 
-	a1: Arm;
-	a2: Arm;
-	a3: Arm;
+	armList: Arm[];
+	keyList = [];
 
 	constructor() {
 		this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
@@ -176,21 +178,39 @@ class SimpleGame {
 		// setup behaviour of individual bits
 
 		this.mouth.body.mass = tweaks.mouthMass;
-		mouthMass.onChange( value => this.mouth.body.mass = value );
-		
+		mouthMass.onChange(value => this.mouth.body.mass = value);
+		this.keyList = [];
 		var setupCursors = () => {
-			this.cursors = this.game.input.keyboard.createCursorKeys();
-			this.cursors2 = {
+			this.keyList[0] = this.game.input.keyboard.createCursorKeys();
+			this.keyList[1] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.W),
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
 			}
-			this.cursors3 = {
+			this.keyList[2] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
+			}
+			this.keyList[3] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
+			}
+			this.keyList[4] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.F),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.H),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.T),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.G),
+			}
+			this.keyList[5] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.Z),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.V),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.X),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.C),
 			}
 		}
 		setupCursors();
@@ -201,11 +221,12 @@ class SimpleGame {
 			arm.attachTo(this.mouth.body, rotation);
 			return arm;
 		}
-		this.a1 = createNoodlyAppendage("ball1", 2 * Math.PI * (0 / 3), 0 ,3);
-		this.a2 = createNoodlyAppendage("ball2", 2 * Math.PI * (1 / 3), 1, 3);
-		this.a3 = createNoodlyAppendage("ball3", 2 * Math.PI * (2 / 3), 2, 3);
+		this.armList = [];
+		for (let a = 0; a < armsTotal; ++a) {
+			this.armList[a] = createNoodlyAppendage("arm" + a + 1, 2 * Math.PI * (a / armsTotal), a, armsTotal);
+		}
 
-		this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
+		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
 
 		window["game"] = this;
 	}
@@ -230,18 +251,17 @@ class SimpleGame {
 
 		}
 
-		forceBody(this.a1.tip, this.cursors, tweaks.tentacleForce);
-		forceBody(this.a2.tip, this.cursors2, tweaks.tentacleForce);
-		forceBody(this.a3.tip, this.cursors3, tweaks.tentacleForce);
-
+		for (let a = 0; a < armsTotal; ++a) {
+			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
+		}
 	}
 }
 
 window.onload = () => {
-	    var game = new SimpleGame();
+	var game = new SimpleGame();
 };
 
-function armDraw(){
+function armDraw() {
 	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { create: create });
 
 	function create() {
