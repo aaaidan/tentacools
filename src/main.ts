@@ -241,7 +241,7 @@ class SimpleGame {
 		for (var i = 0; i < foodCount; i++) {
 			var food = this.allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.scale.setTo(0.2, 0.2);
-			food.body.setCircle(food.width / 2 * 0.7, 0, 0, 0);
+			food.body.setCircle(food.width / 2 * 0.8, 0, 0, 0);
 			food.body.setCollisionGroup(foodCollisionGroup);
 			food.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 		}
