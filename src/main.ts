@@ -254,7 +254,6 @@ class SimpleGame {
 			foodBody.sprite.alpha -= 0.1;
 		};
 
-
 		this.armList.forEach(arm => {
 			arm.balls.forEach(ball => {
 				ball.body.setCollisionGroup(starfishCollisionGroup);
