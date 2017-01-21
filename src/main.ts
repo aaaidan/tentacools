@@ -3,25 +3,27 @@
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = false;
 
-declare const dat:any;
+declare const dat: any;
 const gui = new dat.GUI();
+const armsTotal = 5;
+
 
 var tweaks = {
 	stiffness: 10,
 	damping: 500,
 	mouthMass: 25,
 	tentacleForce: 300,
-	armLengthStiffness: 30, 
+	armLengthStiffness: 30,
 	armLengthRelaxation: 10  // 35?
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
 	guiParam.___changeCallbacks___ = [];
-	guiParam.addListener = (function(callback) {
+	guiParam.addListener = (function (callback) {
 		this.___changeCallbacks___.push(callback);
 	}).bind(guiParam);
-	guiParam.onChange((function(val) {
-		this.___changeCallbacks___.forEach(cb => cb(val) );
+	guiParam.onChange((function (val) {
+		this.___changeCallbacks___.forEach(cb => cb(val));
 	}).bind(guiParam));
 }
 
@@ -53,44 +55,49 @@ class Arm {
 	springs: p2.RotationalSpring[];
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
-	constructor(game:Phaser.Game, spriteName:String) {
-		this.id = Arm.armIdCounter++;
 
+	constructor(game: Phaser.Game, spriteName: String, armNumber: number, total: number) {
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
 		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
+		const angle = Math.PI * 2 * (armNumber / total);
 		const segmentLength = 10;
 		const totalMass = 1;
 		const segmentCount = 20;
-		for (var i=0; i<segmentCount; i++) {
-			var ball:Phaser.Sprite = this.game.add.sprite(0, i * segmentLength, spriteName);
-			ball.scale.set( 1 / (1 + i/(segmentCount-1)) );
-			this.balls.push( ball );
-		}
-		this.game.physics.p2.enable( this.balls, SHOW_PHYSICS_DEBUG );
-		this.tip = this.balls[this.balls.length-1];
 
-		var lastBall:Phaser.Sprite = null;
-		this.balls.forEach( b => {
+		for (var i = 0; i < segmentCount; i++) {
+			let x = Math.cos(angle) * i * segmentLength;
+			let y = Math.sin(angle) * i * segmentLength;
+			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
+			ball.tint = armNumber / total * 0x00ffff + 1 /armNumber / total * 0xff0000;
+			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
+			this.balls.push(ball);
+		}
+		this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);
+		this.tip = this.balls[this.balls.length - 1];
+
+		var lastBall: Phaser.Sprite = null;
+		this.balls.forEach(b => {
 			b.body.mass = totalMass / segmentCount;
-			b.body.collideWorldBounds = false;			
-			if (lastBall) {
-				var hinge = this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
+			b.body.collideWorldBounds = false;
+
+		if (lastBall) {
+				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);
 				// hinge.setStiffness(armLengthStiffness);
 				// hinge.setRelaxation(armLengthRelaxation);
 				this.hinges.push(hinge);
 
-				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, tweaks.stiffness, tweaks.damping );
+				var spring = this.game.physics.p2.createRotationalSpring(b, lastBall, 0, tweaks.stiffness, tweaks.damping);
 				this.springs.push(spring);
 			}
 			lastBall = b;
 		});
 
 		stiffness.addListener((value) => {
-			this.springs.forEach( s => {
+			this.springs.forEach(s => {
 				s.data.stiffness = value;
 			});
 		});
@@ -99,13 +106,13 @@ class Arm {
 				s.damping = value;
 			});
 		});
-		armLengthStiffness.addListener( value => {
-			this.hinges.forEach( h => {
+		armLengthStiffness.addListener(value => {
+			this.hinges.forEach(h => {
 				h.setStiffness(value);
 			})
 		});
-		armLengthRelaxation.addListener( value => {
-			this.hinges.forEach( h => {
+		armLengthRelaxation.addListener(value => {
+			this.hinges.forEach(h => {
 				h.setRelaxation(value);
 			})
 		});
@@ -115,17 +122,17 @@ class Arm {
 		return this.balls[0].body;
 	}
 
-	attachTo(body:Phaser.Physics.P2.Body, rotation:number) {
-		this.game.physics.p2.createRevoluteConstraint( body, [0,0], this.getBase(), [0,0], maxForce );
+	attachTo(body: Phaser.Physics.P2.Body, rotation: number) {
+		this.game.physics.p2.createRevoluteConstraint(body, [0, 0], this.getBase(), [0, 0], maxForce);
 		const USELESS = 0; // setting rest rotation in constructor doesn't work properly for some mysterious reason
-		var rotationSpring = this.game.physics.p2.createRotationalSpring( body, this.getBase(), USELESS, 120, 5 );
+		var rotationSpring = this.game.physics.p2.createRotationalSpring(body, this.getBase(), USELESS, 120, 5);
 		rotationSpring.data.restAngle = rotation;
 	}
 }
 
 class SimpleGame {
-    game: Phaser.Game;
-    mouth: Phaser.Sprite;
+	game: Phaser.Game;
+	mouth: Phaser.Sprite;
 
 	cursors: Phaser.CursorKeys;
 	cursors2: Phaser.CursorKeys;
@@ -135,26 +142,26 @@ class SimpleGame {
 	j2: Phaser.Physics.P2.RevoluteConstraint;
 	j3: Phaser.Physics.P2.RevoluteConstraint;
 
-	a1: Arm;
-	a2: Arm;
-	a3: Arm;
+	armList: Arm[];
+	keyList = [];
 
-    constructor() {
-        this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
-            create: this.create, preload: this.preload, update: this.update
-        });
-    }
-    preload() {
-		this.game.load.image('background','assets/debug-grid-1920x1920.png');
-    }
+	constructor() {
+		this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
+			create: this.create, preload: this.preload, update: this.update
+		});
+	}
+	preload() {
+		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
+		this.game.load.image('segment', 'assets/segment.png');
+	}
 
-    create() {
+	create() {
 
-    	this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
+		this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
 
-    	this.game.world.setBounds(0, 0, 1920, 1920);		
+		this.game.world.setBounds(0, 0, 1920, 1920);
 
-        this.mouth = this.game.add.sprite(this.game.width/2, this.game.height/2, "mouth");
+		this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "mouth");
 		this.mouth.bringToTop();
 
 		// this.mouth.scale.set(0.1);
@@ -162,79 +169,147 @@ class SimpleGame {
 		// this.arm2.scale.set(0.1);
 		// this.arm3.scale.set(0.1);
 
-        this.game.physics.startSystem(Phaser.Physics.P2JS);
+		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
 
-        // Enabled physics on mouth
-        this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
+		// Enabled physics on mouth
+		this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
 
 		// setup behaviour of individual bits
+
 		this.mouth.body.mass = tweaks.mouthMass;
-		mouthMass.onChange( value => this.mouth.body.mass = value );
-		
+		mouthMass.onChange(value => this.mouth.body.mass = value);
+		this.keyList = [];
 		var setupCursors = () => {
-			this.cursors = this.game.input.keyboard.createCursorKeys();
-			this.cursors2 = {
+			this.keyList[0] = this.game.input.keyboard.createCursorKeys();
+			this.keyList[1] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.W),
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.S),
 			}
-			this.cursors3 = {
+			this.keyList[2] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
 			}
+			this.keyList[3] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
+			}
+			this.keyList[4] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.F),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.H),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.T),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.G),
+			}
+			this.keyList[5] = {
+				left: this.game.input.keyboard.addKey(Phaser.Keyboard.Z),
+				right: this.game.input.keyboard.addKey(Phaser.Keyboard.V),
+				up: this.game.input.keyboard.addKey(Phaser.Keyboard.X),
+				down: this.game.input.keyboard.addKey(Phaser.Keyboard.C),
+			}
 		}
 		setupCursors();
 
-		var createNoodlyAppendage = (imageName, rotation) => {
-			var arm = new Arm(this.game, imageName);
+		var createNoodlyAppendage = (imageName, rotation, armNumber, total) => {
+			var arm = new Arm(this.game, imageName, armNumber, total);
 			this.game.world.add(arm.sprite);
 			arm.attachTo(this.mouth.body, rotation);
 			return arm;
 		}
-		this.a1 = createNoodlyAppendage("ball1", 2*Math.PI * (0/3) );
-		this.a2 = createNoodlyAppendage("ball2", 2*Math.PI * (1/3) );
-		this.a3 = createNoodlyAppendage("ball3", 2*Math.PI * (2/3) );
+		this.armList = [];
+		for (let a = 0; a < armsTotal; ++a) {
+			this.armList[a] = createNoodlyAppendage("arm" + a + 1, 2 * Math.PI * (a / armsTotal), a, armsTotal);
+		}
+
+		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
+
+		// Collision stuff
+		this.game.physics.p2.setImpactEvents(true);
+
+		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var starfishCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		this.game.physics.p2.updateBoundsCollisionGroup();
 		
-		this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
+		var allFood = this.game.add.group();
+		allFood.enableBody = true;
+		allFood.physicsBodyType = Phaser.Physics.P2JS;
+
+		for (var i = 0; i < 200; i++)
+		{
+			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
+			food.body.setRectangle(40, 40);
+			food.body.setCollisionGroup(foodCollisionGroup);
+
+			food.body.collides([foodCollisionGroup, starfishCollisionGroup]);
+		}
+
+		var foodHit = (playerBody, foodBody) => {
+			foodBody.sprite.alpha -= 0.1;
+		};
+
+		this.armList.forEach(arm => {
+			arm.balls.forEach(ball => {
+				ball.body.setCollisionGroup(starfishCollisionGroup);
+				ball.body.collides(foodCollisionGroup, foodHit);
+			});
+		});
+		//End collision stuff
 
 		window["game"] = this;
-    }
+	}
 
 	update() {
 		function forceBody(arm, keys, forceAmt) {
-			if (keys.left.isDown)
-			{
+			if (keys.left.isDown) {
 				arm.body.force.x = -forceAmt;
 				// arm.body.rotateLeft(forceAmt)
 			}
-			else if (keys.right.isDown)
-			{
+			else if (keys.right.isDown) {
 				arm.body.force.x = forceAmt;
 				// arm.body.rotateRight(forceAmt);
 			}
-			
-			if (keys.up.isDown)
-			{
+
+			if (keys.up.isDown) {
 				arm.body.force.y = -forceAmt;
 			}
-			else if (keys.down.isDown)
-			{
+			else if (keys.down.isDown) {
 				arm.body.force.y = forceAmt;
 			}
-			
-		} 
 
-		forceBody(this.a1.tip, this.cursors, tweaks.tentacleForce);
-		forceBody(this.a2.tip, this.cursors2, tweaks.tentacleForce);
-		forceBody(this.a3.tip, this.cursors3, tweaks.tentacleForce);
+		}
 
+		for (let a = 0; a < armsTotal; ++a) {
+			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
+		}
 	}
 }
 
 window.onload = () => {
-    var game = new SimpleGame();
+	var game = new SimpleGame();
 };
+
+function armDraw() {
+	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { create: create });
+
+	function create() {
+
+		var graphics = game.add.graphics(100, 100);
+		var length = 100;
+		let total = 5;
+		for (let count = 0; count < total; ++count) {
+			graphics.lineStyle(5, 0x33FF00);
+			graphics.moveTo(0, 0);
+			let angle = Math.PI * 2 * (count / total);
+			let x = Math.cos(angle) * length;
+			let y = Math.sin(angle) * length;
+			//	console.log(x,y, angle);
+			graphics.lineTo(x, y);
+		}
+
+	}
+}
