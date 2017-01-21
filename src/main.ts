@@ -1,8 +1,8 @@
 /// <reference path="../tsd/phaser.d.ts"/>
 
 const maxForce = 2000; // who knows
-const SHOW_PHYSICS_DEBUG = true;
-const MOTION_FORCE = 5;
+const SHOW_PHYSICS_DEBUG = false;
+const MOTION_FORCE = 2;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
@@ -14,7 +14,7 @@ var tweaks = {
 	stiffness: 10,
 	damping: 500,
 	mouthMass: 10,
-	tentacleForce: 100,
+	tentacleForce: 200,
 	armLengthStiffness: 30,
 	armLengthRelaxation: 10
 }
@@ -47,9 +47,12 @@ extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
 class SimpleGame {
 	game: Phaser.Game;
-	mouth: Phaser.Sprite;
+	
+	title: Phaser.Sprite;
 
+	mouth: Phaser.Sprite;
 	armList: Arm[];
+
 	keyList = [];
 
 	allFood: Phaser.Group;
@@ -65,11 +68,13 @@ class SimpleGame {
 		});
 	}
 	preload() {
-		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
+		this.game.load.image('background', 'assets/background-tile.png');
+		this.game.load.image('segment', 'assets/ball.png');
 		this.game.load.image('food', 'assets/food.gif');
 		this.game.load.image('shell', 'assets/shell.gif');
 		this.game.load.image('energy', 'assets/energy.gif')
 		//	this.game.load.image('segment', 'assets/segment.png');
+		this.game.load.image('title', 'assets/title.png');
 	}
 
 	create() {
@@ -84,6 +89,7 @@ class SimpleGame {
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
 		this.mouth.bringToTop();
+		this.mouth.scale.set(0.6);
 
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
@@ -230,15 +236,34 @@ class SimpleGame {
 			shell.body.collides([foodCollisionGroup, shellCollisionGroup, mouthCollisionGroup, urchinCollisionGroup].concat(this.armsCollisionGroups));
 		}
 
+		// TITLESCREEN
+		this.title = this.game.add.sprite( this.game.width / 2, this.game.height / 2, "title");
+		this.title.pivot.set( this.title.width / 2, this.title.height / 2 );
+		this.title.scale.set(0.8);
+		this.title.fixedToCamera = true;
+
+		// Sort out z-index of important items
+		this.mouth.bringToTop();
+		this.title.bringToTop();
+
 		window["game"] = this;
 	}
 
 	update() {
+
+		// Hide title screen after a while
+		// Feel free to delete this or move it somewhere else somehow
+		if (this.title && this.game.time.now > 5000) {
+			this.title.alpha -= 0.05;
+			if (this.title.alpha < 0) {
+				this.game.world.removeChild(this.title);
+			}
+		}
+
 		function anglise(tip: Phaser.Sprite, direction: number, force: number) {
 			let rotation = tip.rotation + direction;
 			tip.body.force.x = Math.cos(rotation) * force;
 			tip.body.force.y = Math.sin(rotation) * force;
-			// console.log(tip.body.force.x);
 		}
 
 		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {

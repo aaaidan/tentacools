@@ -1,3 +1,3 @@
-# Let's all feed The Mouth
+# Let's All Feed The Mouth
 
 A game about feeding The Mouth, together.
