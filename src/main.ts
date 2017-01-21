@@ -166,9 +166,10 @@ class SimpleGame {
 
 		for (var i = 0; i < foodCount; i++) {
 			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
-			food.body.setRectangle(40, 40);
+			food.body.setRectangle(20, 20);
 			food.body.setCollisionGroup(foodCollisionGroup);
 			food.body.collides(armsCollisionGroups.concat(foodCollisionGroup));
+			food.scale.setTo(0.5, 0.5);
 		}
 
 		window["game"] = this;
