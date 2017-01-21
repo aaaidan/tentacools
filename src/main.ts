@@ -157,18 +157,12 @@ class SimpleGame {
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
 			}
 			this.keyList[3] = {
-				left: this.game.input.keyboard.addKey(Phaser.Keyboard.J),
-				right: this.game.input.keyboard.addKey(Phaser.Keyboard.L),
-				up: this.game.input.keyboard.addKey(Phaser.Keyboard.I),
-				down: this.game.input.keyboard.addKey(Phaser.Keyboard.K),
-			}
-			this.keyList[4] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.F),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.H),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.T),
 				down: this.game.input.keyboard.addKey(Phaser.Keyboard.G),
 			}
-			this.keyList[5] = {
+			this.keyList[4] = {
 				left: this.game.input.keyboard.addKey(Phaser.Keyboard.Z),
 				right: this.game.input.keyboard.addKey(Phaser.Keyboard.V),
 				up: this.game.input.keyboard.addKey(Phaser.Keyboard.X),
