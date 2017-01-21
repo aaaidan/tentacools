@@ -19,7 +19,7 @@ class Arm {
 		this.sprite = new Phaser.Group(this.game);
 
 		const angle = Math.PI * 2 * (armIndex / armsTotal);
-		const segmentLength = 10;
+		const segmentLength = 15;
 		const totalMass = 1;
 		const segmentCount = 15;
 
@@ -42,7 +42,7 @@ class Arm {
 			if (lastBall) {
 				var hinge = this.game.physics.p2.createRevoluteConstraint(
 					b, [0, 0],
-					lastBall, [b.x - lastBall.x, b.y - lastBall.y],
+					lastBall, [ b.x - lastBall.x, b.y - lastBall.y ],
 					maxForce);
 				// hinge.setStiffness(armLengthStiffness);
 				// hinge.setRelaxation(armLengthRelaxation);
