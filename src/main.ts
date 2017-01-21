@@ -2,7 +2,7 @@
 
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = true;
-
+const MOTION_FORCE = 5;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
@@ -11,8 +11,8 @@ const foodCount = 200;
 var tweaks = {
 	stiffness: 10,
 	damping: 500,
-	mouthMass: 30,
-	tentacleForce: 300,
+	mouthMass: 10,
+	tentacleForce: 100,
 	armLengthStiffness: 30,
 	armLengthRelaxation: 10
 }
@@ -57,7 +57,7 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
-	//	this.game.load.image('segment', 'assets/segment.png');
+		//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
 	create() {
@@ -138,13 +138,13 @@ class SimpleGame {
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var starfishCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		this.game.physics.p2.updateBoundsCollisionGroup();
-		
+
 		var allFood = this.game.add.group();
 		allFood.enableBody = true;
 		allFood.physicsBodyType = Phaser.Physics.P2JS;
 
-		for (var i = 0; i < foodCount; i++)
-		{
+
+		for (var i = 0; i < foodCount; i++) {
 			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(40, 40);
 			food.body.setCollisionGroup(foodCollisionGroup);
@@ -168,21 +168,32 @@ class SimpleGame {
 	}
 
 	update() {
-		function forceBody(arm, keys, forceAmt) {
+		function anglise(tip: Phaser.Sprite, direction: number, force: number) {
+			let rotation = tip.rotation + direction;
+			tip.body.force.x = Math.cos(rotation) * force;
+			tip.body.force.y = Math.sin(rotation) * force;
+			console.log(tip.body.force.x);
+		}
+
+		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
+
 			if (keys.left.isDown) {
-				arm.body.force.x = -forceAmt;
-				// arm.body.rotateLeft(forceAmt)
+				anglise(tip, Math.PI * 3 / 2, forceAmt)
+
+
 			}
 			else if (keys.right.isDown) {
-				arm.body.force.x = forceAmt;
-				// arm.body.rotateRight(forceAmt);
+				anglise(tip, Math.PI / 2, forceAmt)
+
 			}
 
 			if (keys.up.isDown) {
-				arm.body.force.y = -forceAmt;
+				anglise(tip, 0, forceAmt * MOTION_FORCE);
+
 			}
 			else if (keys.down.isDown) {
-				arm.body.force.y = forceAmt;
+				anglise(tip, Math.PI, forceAmt * MOTION_FORCE);
+
 			}
 
 		}

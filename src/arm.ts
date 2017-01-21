@@ -74,6 +74,8 @@ class Arm {
 				h.setRelaxation(value);
 			});
 		});
+		this.tip.body.force.x = Math.random() - 0.5 * 2000;
+		this.tip.body.force.y = Math.random() - 0.5 * 2000;
 	}
 
 	getBase() {
