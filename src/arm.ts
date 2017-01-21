@@ -38,14 +38,14 @@ class Arm {
 		this.balls.forEach(b => {
 			b.body.mass = totalMass / segmentCount;
 			b.body.collideWorldBounds = false;
-			b.body.setCircle(b.width / 2);
+			b.body.setCircle(b.width / 2, 0, 0, -angle);
 			if (lastBall) {
 				var hinge = this.game.physics.p2.createRevoluteConstraint(
 					b, [0, 0],
-					lastBall, [ b.x - lastBall.x, b.y - lastBall.y ],
+					lastBall, [0, segmentLength], //[ b.x - lastBall.x, b.y - lastBall.y ],
 					maxForce);
-				// hinge.setStiffness(armLengthStiffness);
-				// hinge.setRelaxation(armLengthRelaxation);
+				hinge.setStiffness(tweaks.armLengthStiffness);
+				hinge.setRelaxation(tweaks.armLengthRelaxation);
 				this.hinges.push(hinge);
 
 				var spring = this.game.physics.p2.createRotationalSpring(b, lastBall, 0, tweaks.stiffness, tweaks.damping);
@@ -67,12 +67,12 @@ class Arm {
 		armLengthStiffness.addListener(value => {
 			this.hinges.forEach(h => {
 				h.setStiffness(value);
-			})
+			});
 		});
 		armLengthRelaxation.addListener(value => {
 			this.hinges.forEach(h => {
 				h.setRelaxation(value);
-			})
+			});
 		});
 	}
 
@@ -84,6 +84,6 @@ class Arm {
 		this.game.physics.p2.createRevoluteConstraint(body, [0, 0], this.getBase(), [0, 0], maxForce);
 		const USELESS = 0; // setting rest rotation in constructor doesn't work properly for some mysterious reason
 		var rotationSpring = this.game.physics.p2.createRotationalSpring(body, this.getBase(), USELESS, 120, 5);
-		// rotationSpring.data.restAngle = 0;
+		rotationSpring.data.restAngle = rotation;
 	}
 }

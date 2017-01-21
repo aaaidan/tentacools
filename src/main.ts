@@ -1,7 +1,7 @@
 /// <reference path="../tsd/phaser.d.ts"/>
 
 const maxForce = 2000; // who knows
-const SHOW_PHYSICS_DEBUG = true || true;
+const SHOW_PHYSICS_DEBUG = true;
 
 declare const dat: any;
 const gui = new dat.GUI();
@@ -14,7 +14,7 @@ var tweaks = {
 	mouthMass: 30,
 	tentacleForce: 300,
 	armLengthStiffness: 30,
-	armLengthRelaxation: 10  // 35?
+	armLengthRelaxation: 10
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
