@@ -7,8 +7,8 @@ declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
 const foodCount = 100;
-const urchinCount = 100;
-const shellCount = 100
+const urchinCount = 50;
+const shellCount = 75
 
 var tweaks = {
 	stiffness: 10,
@@ -47,7 +47,7 @@ extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
 class SimpleGame {
 	game: Phaser.Game;
-	
+
 	title: Phaser.Sprite;
 
 	mouth: Phaser.Sprite;
@@ -57,6 +57,8 @@ class SimpleGame {
 
 	allFood: Phaser.Group;
 	urchinGroup: Phaser.Group; //Declare ALL the globals
+
+	playerEnergy: PlayerEnergy;
 
 	armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[];
 
@@ -70,7 +72,8 @@ class SimpleGame {
 		this.game.load.image('segment', 'assets/ball.png');
 		this.game.load.image('food', 'assets/food.gif');
 		this.game.load.image('shell', 'assets/shell.gif');
-
+		this.game.load.image('energy', 'assets/energy.gif')
+		//	this.game.load.image('segment', 'assets/segment.png');
 		this.game.load.image('title', 'assets/title.png');
 	}
 
@@ -80,7 +83,12 @@ class SimpleGame {
 
 		this.game.world.setBounds(0, 0, 1920, 1920);
 
-		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
+		console.log(this.game.world.centerX, this.game.world.centerY);
+
+		this.playerEnergy = new PlayerEnergy(this.game, 1000);
+
+		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
+		this.mouth.bringToTop();
 		this.mouth.scale.set(0.6);
 
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
@@ -88,7 +96,7 @@ class SimpleGame {
 
 		// Enabled physics on mouth
 		this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
-        this.game.physics.p2.setImpactEvents(true);
+		this.game.physics.p2.setImpactEvents(true);
 
 		// setup behaviour of individual bits
 
@@ -129,17 +137,17 @@ class SimpleGame {
 			}
 		}
 		setupCursors();
-		
+
 		// Collision groups
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
-        var urchinCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var urchinCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var mouthCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		this.armsCollisionGroups = [];
 
 		this.game.physics.p2.updateBoundsCollisionGroup();
 
-		
+
 		for (let i = 0; i < armsTotal; i++) {
 			this.armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
 		}
@@ -152,15 +160,15 @@ class SimpleGame {
 
 		var foodHitMouth = (playerBody, foodBody) => {
 			let sprite = foodBody.sprite;
-			sprite.kill();if (sprite.group){   sprite.group.remove(sprite);}else if (sprite.parent){   sprite.parent.removeChild(sprite);}
+			sprite.kill(); if (sprite.group) { sprite.group.remove(sprite); } else if (sprite.parent) { sprite.parent.removeChild(sprite); }
 			foodBody.destroy();
+
+			this.playerEnergy.increaeEnergy(100);
 		};
 
 		var urchinHitPlayer = (playerBody, urchinBody) => {
 			// Do reactionary things
 			console.log("Hit urchin");
-
-
 		};
 
 		var createNoodlyAppendage = (armIndex) => {
@@ -229,8 +237,8 @@ class SimpleGame {
 		}
 
 		// TITLESCREEN
-		this.title = this.game.add.sprite( this.game.width / 2, this.game.height / 2, "title");
-		this.title.pivot.set( this.title.width / 2, this.title.height / 2 );
+		this.title = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "title");
+		this.title.pivot.set(this.title.width / 2, this.title.height / 2);
 		this.title.scale.set(0.8);
 		this.title.fixedToCamera = true;
 
@@ -252,34 +260,47 @@ class SimpleGame {
 			}
 		}
 
-		function anglise(tip: Phaser.Sprite, direction: number, force: number) {
+		function anglise(tip: Phaser.Sprite, direction: number, force: number): Phaser.Point {
 			let rotation = tip.rotation + direction;
-			tip.body.force.x = Math.cos(rotation) * force;
-			tip.body.force.y = Math.sin(rotation) * force;
+			let x = Math.cos(rotation) * force;
+			let y = Math.sin(rotation) * force;
+			return new Phaser.Point(x, y);
 		}
 
 		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
-
+			let xForce = 0;
+			let yForce = 0;
 			if (keys.left.isDown) {
-				anglise(tip, 0, forceAmt);
+				let result = anglise(tip, 0, forceAmt);
+				xForce += result.x;
+				yForce += result.y;
 			}
-			else if (keys.right.isDown) {
-				anglise(tip, Math.PI, forceAmt);
+			if (keys.right.isDown) {
+				let result = anglise(tip, Math.PI, forceAmt);
+				xForce += result.x;
+				yForce += result.y;
 			}
 
 			if (keys.up.isDown) {
-				anglise(tip, Math.PI / 2, forceAmt * MOTION_FORCE)
-			}
-			else if (keys.down.isDown) {
-				anglise(tip, Math.PI * 3 / 2, forceAmt * MOTION_FORCE)
-			}
+				let result = anglise(tip, Math.PI / 2, forceAmt * MOTION_FORCE);
+				xForce += result.x;
+				yForce += result.y;
 
+			}
+			if (keys.down.isDown) {
+				let result = anglise(tip, Math.PI * 3 / 2, forceAmt * MOTION_FORCE);
+				xForce += result.x;
+				yForce += result.y;
+			}
+			tip.body.force.x = xForce;
+			tip.body.force.y = yForce;
 		}
 
 		for (let a = 0; a < armsTotal; ++a) {
 			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
 		}
-		
+
+		this.playerEnergy.decreaseEnergy(1);
 	}
 }
 
