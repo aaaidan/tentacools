@@ -6,7 +6,9 @@ const MOTION_FORCE = 5;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
-const foodCount = 200;
+const foodCount = 100;
+const urchinCount = 100;
+const shellCount = 100
 
 var tweaks = {
 	stiffness: 10,
@@ -50,6 +52,9 @@ class SimpleGame {
 	armList: Arm[];
 	keyList = [];
 
+	allFood: Phaser.Group;
+	urchinGroup: Phaser.Group; //Declare ALL the globals
+
 	constructor() {
 		this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
 			create: this.create, preload: this.preload, update: this.update
@@ -57,6 +62,8 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
+		this.game.load.image('food', 'assets/food.gif');
+		this.game.load.image('shell', 'assets/shell.gif');
 		//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
@@ -121,7 +128,7 @@ class SimpleGame {
 		// Collision groups
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
-        var explosiveCollisionGroup = this.game.physics.p2.createCollisionGroup();
+        var urchinCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var mouthCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[] = [];
 
@@ -132,12 +139,21 @@ class SimpleGame {
 			armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
 		}
 
-		var foodHitArm = (playerBody, foodBody) => {
-			foodBody.sprite.alpha -= 0.1;
-		};
+		// var foodHitArm = (playerBody, foodBody) => {
+		// 	let sprite = foodBody.sprite;
+		// 	sprite.kill();if (sprite.group){   sprite.group.remove(sprite);}else if (sprite.parent){   sprite.parent.removeChild(sprite);}
+		// 	foodBody.destroy();
+		// };
 
 		var foodHitMouth = (playerBody, foodBody) => {
-			console.log("Food in mouth");
+			let sprite = foodBody.sprite;
+			sprite.kill();if (sprite.group){   sprite.group.remove(sprite);}else if (sprite.parent){   sprite.parent.removeChild(sprite);}
+			foodBody.destroy();
+		};
+
+		var urchinHitPlayer = (playerBody, urchinBody) => {
+			// Do reactionary things
+			console.log("Hit urchin");
 		};
 
 		var createNoodlyAppendage = (armIndex) => {
@@ -153,23 +169,50 @@ class SimpleGame {
 			this.armList[a] = createNoodlyAppendage(a);
 			this.armList[a].balls.forEach(ball => {
 				ball.body.setCollisionGroup(armsCollisionGroups[a]);
-				ball.body.collides(foodCollisionGroup, foodHitArm);
+				ball.body.collides([foodCollisionGroup, shellCollisionGroup]);
+				ball.body.collides(urchinCollisionGroup, urchinHitPlayer);
 			});
 		}
 
 		this.mouth.body.setCollisionGroup(mouthCollisionGroup);
 		this.mouth.body.collides(foodCollisionGroup, foodHitMouth)
+		this.mouth.body.collides(urchinCollisionGroup, urchinHitPlayer);
 
-		var allFood = this.game.add.group();
-		allFood.enableBody = true;
-		allFood.physicsBodyType = Phaser.Physics.P2JS;
+		this.allFood = this.game.add.group();
+		this.allFood.enableBody = true;
+		this.allFood.physicsBodyType = Phaser.Physics.P2JS;
 
 		for (var i = 0; i < foodCount; i++) {
-			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
+			var food = this.allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(20, 20);
 			food.body.setCollisionGroup(foodCollisionGroup);
-			food.body.collides(armsCollisionGroups.concat(foodCollisionGroup));
+			food.body.collides(armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 			food.scale.setTo(0.5, 0.5);
+		}
+
+		this.urchinGroup = this.game.add.group();
+		this.urchinGroup.enableBody = true;
+		this.urchinGroup.physicsBodyType = Phaser.Physics.P2JS;
+
+		for (let i = 0; i < urchinCount; i++) {
+			var urchin = this.urchinGroup.create(this.game.world.randomX, this.game.world.randomY, 'urchin');
+			urchin.body.setRectangle(30, 30);
+			urchin.body.setCollisionGroup(urchinCollisionGroup);
+			urchin.body.collides(armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
+			urchin.scale.setTo(0.75, 0.75);
+		}
+
+		// Don't really need to worry about shells after creation
+
+		var shellGroup = this.game.add.group();
+		shellGroup.enableBody = true;
+		shellGroup.physicsBodyType = Phaser.Physics.P2JS;
+
+		for (let i = 0; i < shellCount; i++) {
+			var shell = shellGroup.create(this.game.world.randomX, this.game.world.randomY, 'shell');
+			shell.body.setRectangle(40, 40);
+			shell.body.setCollisionGroup(shellCollisionGroup);
+			shell.body.collides([foodCollisionGroup, shellCollisionGroup, mouthCollisionGroup, urchinCollisionGroup].concat(armsCollisionGroups));
 		}
 
 		window["game"] = this;
@@ -180,7 +223,7 @@ class SimpleGame {
 			let rotation = tip.rotation + direction;
 			tip.body.force.x = Math.cos(rotation) * force;
 			tip.body.force.y = Math.sin(rotation) * force;
-			console.log(tip.body.force.x);
+			// console.log(tip.body.force.x);
 		}
 
 		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
@@ -204,6 +247,7 @@ class SimpleGame {
 		for (let a = 0; a < armsTotal; ++a) {
 			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
 		}
+		
 	}
 }
 
