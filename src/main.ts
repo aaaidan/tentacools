@@ -122,7 +122,6 @@ class SimpleGame {
 			var arm = new Arm(this.game, armIndex);
 			this.game.world.add(arm.sprite);
 			let appendageRotation = 2 * Math.PI * (armIndex / armsTotal);
-			console.log(`Attaching arm ${armIndex} at ${appendageRotation}`);
 			arm.attachTo(this.mouth.body, appendageRotation);
 			return arm;
 		}
