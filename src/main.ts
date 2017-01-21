@@ -74,7 +74,7 @@ class SimpleGame {
 		});
 	}
 	preload() {
-		this.game.load.image('background', 'assets/background-tile.png');
+		this.game.load.image('background', 'assets/background-tile.png'); // assets/background-tile-space-theme.png
 		this.game.load.image('segment', 'assets/ball.png');
 		this.game.load.image('eyeball-base', 'assets/eyeball-base.png');
 		this.game.load.image('eyeball-iris', 'assets/eyeball-iris.png');
@@ -84,10 +84,11 @@ class SimpleGame {
 		this.game.load.image('mouth-bite1', 'assets/mouth-bite1.png');
 		this.game.load.image('mouth-bite2', 'assets/mouth-bite2.png');
 
-		this.game.load.image('food', 'assets/food.gif');
-		this.game.load.image('shell', 'assets/shell.gif');
-		this.game.load.image('energy', 'assets/energy.gif')
-		//	this.game.load.image('segment', 'assets/segment.png');
+		this.game.load.image('food', 'assets/boigah.png');
+		this.game.load.image('shell', 'assets/shell.png');
+		this.game.load.image('energy', 'assets/energy.gif');
+		this.game.load.image('urchin', 'assets/urchin.png');
+
 		this.game.load.image('title', 'assets/title.png');
 	}
 
@@ -239,10 +240,10 @@ class SimpleGame {
 
 		for (var i = 0; i < foodCount; i++) {
 			var food = this.allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
-			food.body.setRectangle(20, 20);
+			food.scale.setTo(0.2, 0.2);
+			food.body.setCircle(food.width / 2 * 0.7, 0, 0, 0);
 			food.body.setCollisionGroup(foodCollisionGroup);
 			food.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
-			food.scale.setTo(0.5, 0.5);
 		}
 
 		this.urchinGroup = this.game.add.group();
@@ -251,10 +252,10 @@ class SimpleGame {
 
 		for (let i = 0; i < urchinCount; i++) {
 			var urchin = this.urchinGroup.create(this.game.world.randomX, this.game.world.randomY, 'urchin');
-			urchin.body.setRectangle(30, 30);
+			urchin.scale.setTo(0.2);
+			urchin.body.setCircle(urchin.width / 2 * 0.8, 0, 0, 0);
 			urchin.body.setCollisionGroup(urchinCollisionGroup);
 			urchin.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
-			urchin.scale.setTo(0.75, 0.75);
 		}
 
 		// Don't really need to worry about shells after creation
@@ -265,7 +266,8 @@ class SimpleGame {
 
 		for (let i = 0; i < shellCount; i++) {
 			var shell = shellGroup.create(this.game.world.randomX, this.game.world.randomY, 'shell');
-			shell.body.setRectangle(40, 40);
+			shell.scale.setTo(0.55);
+			shell.body.setCircle(shell.width / 2 * 0.8, 0, 0, 0);
 			shell.body.setCollisionGroup(shellCollisionGroup);
 			shell.body.collides([foodCollisionGroup, shellCollisionGroup, mouthCollisionGroup, urchinCollisionGroup].concat(this.armsCollisionGroups));
 		}
