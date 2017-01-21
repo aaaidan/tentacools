@@ -7,8 +7,8 @@ declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
 const foodCount = 100;
-const urchinCount = 100;
-const shellCount = 100
+const urchinCount = 50;
+const shellCount = 75
 
 var tweaks = {
 	stiffness: 10,
@@ -162,13 +162,13 @@ class SimpleGame {
 			let sprite = foodBody.sprite;
 			sprite.kill(); if (sprite.group) { sprite.group.remove(sprite); } else if (sprite.parent) { sprite.parent.removeChild(sprite); }
 			foodBody.destroy();
+
+			this.playerEnergy.increaeEnergy(100);
 		};
 
 		var urchinHitPlayer = (playerBody, urchinBody) => {
 			// Do reactionary things
 			console.log("Hit urchin");
-
-
 		};
 
 		var createNoodlyAppendage = (armIndex) => {
@@ -299,7 +299,6 @@ class SimpleGame {
 		for (let a = 0; a < armsTotal; ++a) {
 			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
 		}
-
 
 		this.playerEnergy.decreaseEnergy(1);
 	}
