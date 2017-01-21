@@ -16,8 +16,8 @@ const shellCount = 7;
 var tweaks = {
 	stiffness: 30,
 	damping: 500,
-	mouthMass: 10,
 	playerBodyMass: 10,
+	mouthMass: 5,
 	tentacleForce: 140,
 	armLengthStiffness: 40,
 	armLengthRelaxation: 30
@@ -64,6 +64,8 @@ class SimpleGame {
 
 	playerBody: Phaser.Sprite;
 	armList: Arm[];
+
+	crab: Crab;
 
 	keyList = [];
 
@@ -198,6 +200,8 @@ class SimpleGame {
 		}
 		setupCursors();
 
+		//Enemy
+		this.crab = new Crab(this.game, this.game.world.centerX+200, this.game.world.centerY+200, this.playerBody);
 		// Collision groups
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
@@ -386,7 +390,7 @@ class SimpleGame {
 		// this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
 		// this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
-
+		this.crab.update();
 		this.playerEnergy.decreaseEnergy(1);
 	}
 }
