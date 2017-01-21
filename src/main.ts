@@ -71,7 +71,8 @@ class Arm {
 		for (var i = 0; i < segmentCount; i++) {
 			let x = Math.cos(angle) * i * segmentLength;
 			let y = Math.sin(angle) * i * segmentLength;
-			var ball: Phaser.Sprite = this.game.add.sprite(x, y, spriteName);
+			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
+			ball.tint = armNumber / total * 0x00ffff + 1 /armNumber / total * 0xff0000;
 			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
 			this.balls.push(ball);
 		}
@@ -153,6 +154,7 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
+		this.game.load.image('segment', 'assets/segment.png');
 	}
 
 	create() {
