@@ -93,6 +93,16 @@ class SimpleGame {
 		this.game.load.image('energy', 'assets/energy.gif');
 		this.game.load.image('urchin', 'assets/urchin.png');
 
+		this.game.load.image('doodad01', 'assets/background-doodad-01.png');
+		this.game.load.image('doodad02', 'assets/background-doodad-02.png');
+		this.game.load.image('doodad03', 'assets/background-doodad-03.png');
+		this.game.load.image('doodad04', 'assets/background-doodad-04.png');
+		this.game.load.image('doodad05', 'assets/background-doodad-05.png');
+		this.game.load.image('doodad06', 'assets/background-doodad-06.png');
+		this.game.load.image('doodad07', 'assets/background-doodad-07.png');
+		this.game.load.image('doodad08', 'assets/background-doodad-08.png');
+		
+
 		this.game.load.image('title', 'assets/title.png');
 	}
 
@@ -231,6 +241,13 @@ class SimpleGame {
 					}
 				}
 			});
+		}
+
+		var randomDoodad = () => {
+			return "doodad0" + (Math.floor(Math.random()*8) + 1);
+		}
+		for (var i=0; i<20; i++) {
+			this.game.add.image(this.game.world.randomX, this.game.world.randomY, randomDoodad());
 		}
 
 		this.mouth.body.setCollisionGroup(mouthCollisionGroup);
