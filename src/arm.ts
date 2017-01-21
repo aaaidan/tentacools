@@ -36,7 +36,7 @@ class Arm {
 			let y = Math.sin(angle) * i * segmentLength + game.world.centerY;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
 			ball.tint = Phaser.Color.interpolateColor(0xffffff, tintColor, segmentCount, i);
-			ball.scale.set(0.5 / (1 + (i / (segmentCount - 1))*1.5 ));
+			ball.scale.set(0.4 / (1 + (i / (segmentCount - 1))*1.5 ));
 			this.balls.push(ball);
 		}
 		this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);

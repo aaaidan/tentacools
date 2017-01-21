@@ -35,7 +35,7 @@ extendGuiParameterToSupportMultipleListeners(stiffness);
 var damping = gui.add(tweaks, 'damping', 1, 500);
 extendGuiParameterToSupportMultipleListeners(damping);
 
-var mouthMass = gui.add(tweaks, 'mouthMass', 1, 500);
+var mouthMass = gui.add(tweaks, 'mouthMass', 1, 100);
 
 var tentacleForce = gui.add(tweaks, 'tentacleForce', 10, 500);
 
@@ -45,12 +45,18 @@ extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
 var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
 extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
+function setPivotCenter(image:Phaser.Image) {
+	image.pivot.set( image.width/2, image.height/2 );
+}
+
 class SimpleGame {
 	game: Phaser.Game;
 
 	title: Phaser.Sprite;
 
 	mouth: Phaser.Sprite;
+	mouthLips: Phaser.Image;
+	eyes:Eye[];
 	armList: Arm[];
 
 	keyList = [];
@@ -96,11 +102,11 @@ class SimpleGame {
 		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
-		this.mouth.scale.set(0.8);
+		this.mouth.scale.set(0.85);
 
 		// add eyes
 		const eyeDistance = 50;
-		const eyes:Eye[] = [];
+		this.eyes = [];
 		for(var i=0; i<3; i++) {
 			// i eye captain
 			let x = Math.sin( 2*Math.PI * (i/3) ) * eyeDistance;
@@ -108,26 +114,16 @@ class SimpleGame {
 			console.log(`eye ${i}, ${x}:${y}`);
 			let eye = new Eye(this.game, x, y);
 			eye.attach(this.mouth);
-			eyes.push(eye);
+			this.eyes.push(eye);
 		}
 		
 		// add mouth-lips
-		let mouthLips = this.game.make.sprite(0,0, "mouth-bite1");
-		this.mouth.addChild(mouthLips);
+		this.mouthLips = this.game.make.image(0,0, "mouth-bite1");
+		setPivotCenter(this.mouthLips);
+		this.mouth.addChild(this.mouthLips);
 
-		window["mouth"] = mouthLips; // for in-browser debug
-		window["eyes"] = eyes;  // for in-browser debug
-
-		setTimeout(() => {
-			mouthLips.body.removeFromWorld();
-			eyes.forEach(e => {
-				e.base.body.removeFromWorld();
-				e.iris.body.removeFromWorld();
-				e.iris.position.set(0,0);
-				e.highlight.body.removeFromWorld();
-				e.highlight.position.set(0,0);
-			});
-		},0);
+		window["mouth"] = this.mouthLips; // for in-browser debug
+		window["eyes"] = this.eyes;  // for in-browser debug
 		
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
@@ -337,6 +333,9 @@ class SimpleGame {
 		for (let a = 0; a < armsTotal; ++a) {
 			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
 		}
+
+		this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
+		this.eyes.forEach(e => e.update() );
 
 		this.playerEnergy.decreaseEnergy(1);
 	}
