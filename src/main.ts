@@ -178,22 +178,17 @@ class SimpleGame {
 		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
 
 			if (keys.left.isDown) {
-				anglise(tip, Math.PI * 3 / 2, forceAmt)
-
-
+				anglise(tip, 0, forceAmt);
 			}
 			else if (keys.right.isDown) {
-				anglise(tip, Math.PI / 2, forceAmt)
-
+				anglise(tip, Math.PI, forceAmt);
 			}
 
 			if (keys.up.isDown) {
-				anglise(tip, 0, forceAmt * MOTION_FORCE);
-
+				anglise(tip, Math.PI / 2, forceAmt * MOTION_FORCE)
 			}
 			else if (keys.down.isDown) {
-				anglise(tip, Math.PI, forceAmt * MOTION_FORCE);
-
+				anglise(tip, Math.PI * 3 / 2, forceAmt * MOTION_FORCE)
 			}
 
 		}
