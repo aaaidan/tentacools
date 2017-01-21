@@ -92,8 +92,8 @@ class Arm {
 
 	attachTo(body: Phaser.Physics.P2.Body, rotation: number) {
 		
-		this.game.physics.p2.createLockConstraint(body, this.getBase()); // a lock seems to work slightly better than the revolute
-		// this.game.physics.p2.createRevoluteConstraint(body, [0,0], this.getBase(), [0,0], maxForce);
+		//this.game.physics.p2.createLockConstraint(body, this.getBase()); // a lock seems to work slightly better than the revolute
+		 this.game.physics.p2.createRevoluteConstraint(body, [0,0], this.getBase(), [0,-50], maxForce);
 
 		const USELESS = 0; // setting rest rotation in constructor doesn't work properly for some mysterious reason
 		var rotationSpring = this.game.physics.p2.createRotationalSpring(body, this.getBase(), USELESS, 120, 5);

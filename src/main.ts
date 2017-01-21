@@ -5,18 +5,18 @@ const SHOW_PHYSICS_DEBUG = false;
 const MOTION_FORCE = 2;
 declare const dat: any;
 const gui = new dat.GUI();
-const armsTotal = 3;
+const armsTotal = 2;
 const foodCount = 100;
 const urchinCount = 50;
 const shellCount = 75
 
 var tweaks = {
-	stiffness: 10,
+	stiffness: 30,
 	damping: 500,
 	mouthMass: 10,
-	tentacleForce: 200,
-	armLengthStiffness: 30,
-	armLengthRelaxation: 10
+	tentacleForce: 140,
+	armLengthStiffness: 40,
+	armLengthRelaxation: 30
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
@@ -102,7 +102,7 @@ class SimpleGame {
 		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
-		this.mouth.scale.set(0.85);
+		this.mouth.scale.set(1.1);
 
 		// add eyes
 		const eyeDistance = 50;
