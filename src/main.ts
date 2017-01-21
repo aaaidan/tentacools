@@ -103,7 +103,7 @@ class SimpleGame {
 		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
-		this.mouth.scale.set(1.1);
+		this.mouth.scale.set(0.9);
 
 		// add eyes
 		const eyeDistance = 50;
