@@ -7,8 +7,12 @@ declare const dat:any;
 const gui = new dat.GUI();
 
 var tweaks = {
-	stiffness: 80,
-	damping: 500
+	stiffness: 10,
+	damping: 500,
+	mouthMass: 25,
+	tentacleForce: 300,
+	armLengthStiffness: 30, 
+	armLengthRelaxation: 10  // 35?
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
@@ -21,11 +25,21 @@ function extendGuiParameterToSupportMultipleListeners(guiParam) {
 	}).bind(guiParam));
 }
 
-var stiffness = gui.add(tweaks, 'stiffness', 10, 200);
+var stiffness = gui.add(tweaks, 'stiffness', 1, 50);
 extendGuiParameterToSupportMultipleListeners(stiffness);
 
 var damping = gui.add(tweaks, 'damping', 1, 500);
 extendGuiParameterToSupportMultipleListeners(damping);
+
+var mouthMass = gui.add(tweaks, 'mouthMass', 1, 500);
+
+var tentacleForce = gui.add(tweaks, 'tentacleForce', 10, 500);
+
+var armLengthStiffness = gui.add(tweaks, 'armLengthStiffness', 1, 50);
+extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
+
+var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
+extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
 class Arm {
 
@@ -37,6 +51,7 @@ class Arm {
 	game: Phaser.Game;
 	tip: Phaser.Sprite;
 	springs: any[];
+	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 	constructor(game:Phaser.Game, spriteName:String) {
 		this.id = Arm.armIdCounter++;
@@ -44,6 +59,7 @@ class Arm {
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
+		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
 		const segmentLength = 10;
@@ -62,7 +78,11 @@ class Arm {
 			b.body.mass = totalMass / ballCount;
 			b.body.collideWorldBounds = false;			
 			if (lastBall) {
-				this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
+				var hinge = this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
+				// hinge.setStiffness(armLengthStiffness);
+				// hinge.setRelaxation(armLengthRelaxation);
+				this.hinges.push(hinge);
+
 				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, tweaks.stiffness, tweaks.damping );
 				this.springs.push(spring);
 			}
@@ -80,6 +100,16 @@ class Arm {
 				s.data.damping = value;
 				console.log("damp", value, this.id);
 			});
+		});
+		armLengthStiffness.addListener( value => {
+			this.hinges.forEach( h => {
+				h.setStiffness(value);
+			})
+		});
+		armLengthRelaxation.addListener( value => {
+			this.hinges.forEach( h => {
+				h.setRelaxation(value);
+			})
 		});
 	}
 
@@ -141,7 +171,8 @@ class SimpleGame {
         this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
 
 		// setup behaviour of individual bits
-		this.mouth.body.mass = 5;
+		this.mouth.body.mass = tweaks.mouthMass;
+		mouthMass.onChange( value => this.mouth.body.mass = value );
 		
 		var setupCursors = () => {
 			this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -176,9 +207,6 @@ class SimpleGame {
     }
 
 	update() {
-		const FORCE = 300;
-		const ROTATE_FORCE = 10;
-
 		function forceBody(arm, keys, forceAmt) {
 			if (keys.left.isDown)
 			{
@@ -202,9 +230,9 @@ class SimpleGame {
 			
 		} 
 
-		forceBody(this.a1.tip, this.cursors, FORCE);
-		forceBody(this.a2.tip, this.cursors2, FORCE);
-		forceBody(this.a3.tip, this.cursors3, FORCE);
+		forceBody(this.a1.tip, this.cursors, tweaks.tentacleForce);
+		forceBody(this.a2.tip, this.cursors2, tweaks.tentacleForce);
+		forceBody(this.a3.tip, this.cursors3, tweaks.tentacleForce);
 
 	}
 }
