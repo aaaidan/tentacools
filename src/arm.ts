@@ -1,3 +1,5 @@
+const ARM_TOTAL: number = 3;
+
 class Arm {
 
 	static armIdCounter: number = 0;
@@ -11,14 +13,14 @@ class Arm {
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 
-	constructor(game: Phaser.Game, spriteName: String, armNumber: number, total: number) {
+	constructor(game: Phaser.Game, armIndex: number) {
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
 		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
-		const angle = Math.PI * 2 * (armNumber / total);
+		const angle = Math.PI * 2 * (armIndex / ARM_TOTAL);
 		const segmentLength = 10;
 		const totalMass = 1;
 		const segmentCount = 15;
@@ -27,7 +29,7 @@ class Arm {
 			let x = Math.cos(angle) * i * segmentLength + game.world.centerX;
 			let y = Math.sin(angle) * i * segmentLength + game.world.centerY;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
-			ball.tint = armNumber / total * 0x00ffff + 1 /armNumber / total * 0xff0000;
+			ball.tint = armIndex / ARM_TOTAL * 0x00ffff + 1 /armIndex / ARM_TOTAL * 0xff0000;
 			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
 			this.balls.push(ball);
 		}
