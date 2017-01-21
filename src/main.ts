@@ -183,8 +183,6 @@ class SimpleGame {
 		}
 		setupCursors();
 
-		//Enemy
-		this.crab = new Crab(this.game, this.game.world.centerX-200, this.game.world.centerY-200, this.mouth);
 		// Collision groups
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
@@ -194,16 +192,14 @@ class SimpleGame {
 
 		this.game.physics.p2.updateBoundsCollisionGroup();
 
-
 		for (let i = 0; i < armsTotal; i++) {
 			this.armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
 		}
 
-		// var foodHitArm = (playerBody, foodBody) => {
-		// 	let sprite = foodBody.sprite;
-		// 	sprite.kill();if (sprite.group){   sprite.group.remove(sprite);}else if (sprite.parent){   sprite.parent.removeChild(sprite);}
-		// 	foodBody.destroy();
-		// };
+		//Enemy
+		this.crab = new Crab(this.game, this.game.world.centerX-200, this.game.world.centerY-200, this.mouth);
+		this.crab.base.body.setCollisionGroup(urchinCollisionGroup);
+		this.crab.base.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 
 		var foodHitMouth = (playerBody, foodBody) => {
 			let sprite = foodBody.sprite;
