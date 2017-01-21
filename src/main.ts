@@ -1,7 +1,7 @@
 /// <reference path="../tsd/phaser.d.ts"/>
 
 const maxForce = 2000; // who knows
-const SHOW_PHYSICS_DEBUG = false;
+const SHOW_PHYSICS_DEBUG = true || true;
 
 declare const dat: any;
 const gui = new dat.GUI();
@@ -43,18 +43,9 @@ extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
 var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
 extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
-
 class SimpleGame {
 	game: Phaser.Game;
 	mouth: Phaser.Sprite;
-
-	cursors: Phaser.CursorKeys;
-	cursors2: Phaser.CursorKeys;
-	cursors3: Phaser.CursorKeys;
-
-	j1: Phaser.Physics.P2.RevoluteConstraint;
-	j2: Phaser.Physics.P2.RevoluteConstraint;
-	j3: Phaser.Physics.P2.RevoluteConstraint;
 
 	armList: Arm[];
 	keyList = [];
@@ -66,7 +57,7 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
-		this.game.load.image('segment', 'assets/segment.png');
+	//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
 	create() {
@@ -75,13 +66,10 @@ class SimpleGame {
 
 		this.game.world.setBounds(0, 0, 1920, 1920);
 
-		this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "mouth");
-		this.mouth.bringToTop();
+		console.log(this.game.world.centerX, this.game.world.centerY);
 
-		// this.mouth.scale.set(0.1);
-		// this.arm1.scale.set(0.1);
-		// this.arm2.scale.set(0.1);
-		// this.arm3.scale.set(0.1);
+		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
+		this.mouth.bringToTop();
 
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.mouth);
@@ -129,15 +117,15 @@ class SimpleGame {
 		}
 		setupCursors();
 
-		var createNoodlyAppendage = (imageName, rotation, armNumber, total) => {
-			var arm = new Arm(this.game, imageName, armNumber, total);
+		var createNoodlyAppendage = (armIndex) => {
+			var arm = new Arm(this.game, armIndex);
 			this.game.world.add(arm.sprite);
-			arm.attachTo(this.mouth.body, rotation);
+			arm.attachTo(this.mouth.body, 2 * Math.PI * (armIndex / armsTotal));
 			return arm;
 		}
 		this.armList = [];
 		for (let a = 0; a < armsTotal; ++a) {
-			this.armList[a] = createNoodlyAppendage("arm" + a + 1, 2 * Math.PI * (a / armsTotal), a, armsTotal);
+			this.armList[a] = createNoodlyAppendage(a);
 		}
 
 		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
