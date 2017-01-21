@@ -9,9 +9,10 @@ const RECOIL_DURATION_MS = 150;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
-const foodCount = 10;
+const foodCount = 100;
 const urchinCount = 5;
 const shellCount = 7;
+const maxFoodToWin = 3;
 
 var tweaks = {
 	stiffness: 30,
@@ -78,10 +79,10 @@ class SimpleGame {
 	urchinGroup: Phaser.Group; //Declare ALL the globals
 	urchinReaction: boolean;
 
-	playerEnergy: PlayerEnergy;
-
 	armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[];
 	mouthCoillisionGroup: Phaser.Physics.P2.CollisionGroup;
+
+	foodEatenCount: number;
 
 	constructor() {
 		this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
@@ -125,8 +126,6 @@ class SimpleGame {
 
 		console.log(this.game.world.centerX, this.game.world.centerY);
 
-		this.playerEnergy = new PlayerEnergy(this.game, 1000);
-
 		let spawnOffset = 200;
 
 		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, "mouth-bite1");
@@ -136,6 +135,8 @@ class SimpleGame {
 		this.playerBody = this.game.add.sprite(this.mouthGod.x + spawnOffset, this.mouthGod.y + spawnOffset, "segment");
 		this.playerBody.scale.set(playerBodyScale); 
 
+
+		this.foodEatenCount = 0;
 		//add eyes
 		// const eyeDistance = 1;
 		// this.eyes = [];
@@ -233,7 +234,7 @@ class SimpleGame {
 			sprite.kill(); if (sprite.group) { sprite.group.remove(sprite); } else if (sprite.parent) { sprite.parent.removeChild(sprite); }
 			foodBody.destroy();
 
-			this.playerEnergy.increaeEnergy(100);
+			this.foodEatenCount++;
 		};
 
 		this.urchinReaction = false;
@@ -346,6 +347,10 @@ class SimpleGame {
 			}
 		}
 
+		if (this.foodEatenCount >= maxFoodToWin) {
+			console.log("You have won");
+		}
+
 		function anglise(tip: Phaser.Sprite, direction: number, force: number): Phaser.Point {
 			let rotation = tip.rotation + direction;
 			let x = Math.cos(rotation) * force;
@@ -396,7 +401,6 @@ class SimpleGame {
 		// this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
 		this.crab.update();
-		this.playerEnergy.decreaseEnergy(1);
 	}
 }
 
