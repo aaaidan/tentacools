@@ -96,10 +96,11 @@ class SimpleGame {
 		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "segment");
-		this.mouth.scale.set(0.65);
+		this.mouth.scale.set(0.8);
 
 		// add eyes
 		const eyeDistance = 50;
+		const eyes:Eye[] = [];
 		for(var i=0; i<3; i++) {
 			// i eye captain
 			let x = Math.sin( 2*Math.PI * (i/3) ) * eyeDistance;
@@ -107,14 +108,25 @@ class SimpleGame {
 			console.log(`eye ${i}, ${x}:${y}`);
 			let eye = new Eye(this.game, x, y);
 			eye.attach(this.mouth);
+			eyes.push(eye);
 		}
 		
 		// add mouth-lips
 		let mouthLips = this.game.make.sprite(0,0, "mouth-bite1");
 		this.mouth.addChild(mouthLips);
-		window["mouth"] = mouthLips;
+
+		window["mouth"] = mouthLips; // for in-browser debug
+		window["eyes"] = eyes;  // for in-browser debug
+
 		setTimeout(() => {
 			mouthLips.body.removeFromWorld();
+			eyes.forEach(e => {
+				e.base.body.removeFromWorld();
+				e.iris.body.removeFromWorld();
+				e.iris.position.set(0,0);
+				e.highlight.body.removeFromWorld();
+				e.highlight.position.set(0,0);
+			});
 		},0);
 		
 		this.game.physics.startSystem(Phaser.Physics.P2JS);

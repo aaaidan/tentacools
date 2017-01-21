@@ -15,8 +15,8 @@ class Eye {
         this.highlight = this.game.make.sprite(0,0, "eyeball-highlight");
         
         // adding these children causes mayhem...
-        // this.base.addChild(this.iris);
-        // this.base.addChild(this.highlight);
+        this.base.addChild(this.iris);
+        this.base.addChild(this.highlight);
     }
 
     attach(parent:Phaser.Sprite) {
