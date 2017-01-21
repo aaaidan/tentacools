@@ -8,16 +8,17 @@ class Arm {
 
 	static armIdCounter: number = 0;
 
-	id: number;
+	armIndex: number;
 	sprite: Phaser.Group;
 	balls: Phaser.Sprite[];
 	game: Phaser.Game;
 	tip: Phaser.Sprite;
-	springs: any[];
+	springs: p2.RotationalSpring[];
 	hinges: Phaser.Physics.P2.RevoluteConstraint[];
 
 
 	constructor(game: Phaser.Game, armIndex: number) {
+		this.armIndex = armIndex;
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
@@ -88,6 +89,11 @@ class Arm {
 
 	getBase() {
 		return this.balls[0].body;
+	}
+
+	update() {
+		var now = this.game.time.now / 1000;
+		this.springs.forEach(s => s.data.restAngle = Math.sin(2 * Math.PI * now * (0.1+this.armIndex*0.047)) * 0.05);
 	}
 
 	attachTo(body: Phaser.Physics.P2.Body, rotation: number) {

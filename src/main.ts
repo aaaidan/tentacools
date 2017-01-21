@@ -3,6 +3,9 @@
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = false;
 const MOTION_FORCE = 2;
+const RECOIL_FORCE = 20;
+const RECOIL_DURATION_MS = 150;
+
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
@@ -63,6 +66,7 @@ class SimpleGame {
 
 	allFood: Phaser.Group;
 	urchinGroup: Phaser.Group; //Declare ALL the globals
+	urchinReaction: boolean;
 
 	playerEnergy: PlayerEnergy;
 
@@ -201,9 +205,14 @@ class SimpleGame {
 			this.playerEnergy.increaeEnergy(100);
 		};
 
+		this.urchinReaction = false;
 		var urchinHitPlayer = (playerBody, urchinBody) => {
 			// Do reactionary things
 			console.log("Hit urchin");
+			this.urchinReaction = true;
+			setTimeout(() => {
+				this.urchinReaction = false;
+			}, RECOIL_DURATION_MS);
 		};
 
 		var createNoodlyAppendage = (armIndex) => {
@@ -303,7 +312,7 @@ class SimpleGame {
 			return new Phaser.Point(x, y);
 		}
 
-		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
+		var forceBody = (tip: Phaser.Sprite, keys, forceAmt) => {
 			let xForce = 0;
 			let yForce = 0;
 			if (keys.left.isDown) {
@@ -328,6 +337,12 @@ class SimpleGame {
 				xForce += result.x;
 				yForce += result.y;
 			}
+			if (this.urchinReaction) {
+				console.log("recoilin");
+				let result = anglise(tip, Math.PI * 3 / 2, forceAmt * RECOIL_FORCE);
+				xForce += result.x;
+				yForce += result.y;
+			}
 			tip.body.force.x = xForce;
 			tip.body.force.y = yForce;
 		}
@@ -338,6 +353,7 @@ class SimpleGame {
 
 		this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
 		this.eyes.forEach(e => e.update() );
+		this.armList.forEach(arm => arm.update() );
 
 		this.playerEnergy.decreaseEnergy(1);
 	}
