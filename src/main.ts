@@ -1,7 +1,7 @@
 /// <reference path="../tsd/phaser.d.ts"/>
 
 const maxForce = 2000; // who knows
-const SHOW_PHYSICS_DEBUG = false;
+const SHOW_PHYSICS_DEBUG = true || true;
 
 declare const dat: any;
 const gui = new dat.GUI();
@@ -64,16 +64,16 @@ class Arm {
 		this.sprite = new Phaser.Group(this.game);
 
 		const angle = Math.PI * 2 * (armNumber / total);
-		const segmentLength = 10;
+		const segmentLength = 20;
 		const totalMass = 1;
-		const segmentCount = 20;
+		const segmentCount = 15;
 
 		for (var i = 0; i < segmentCount; i++) {
-			let x = Math.cos(angle) * i * segmentLength;
-			let y = Math.sin(angle) * i * segmentLength;
+			let x = Math.cos(angle) * i * segmentLength + this.game.world.centerX;
+			let y = Math.sin(angle) * i * segmentLength + this.game.world.centerY;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
 			ball.tint = armNumber / total * 0x00ffff + 1 /armNumber / total * 0xff0000;
-			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
+			ball.scale.set(0.5 / (1 + i / (segmentCount - 1)));
 			this.balls.push(ball);
 		}
 		this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);
@@ -85,7 +85,7 @@ class Arm {
 			b.body.collideWorldBounds = false;
 
 		if (lastBall) {
-				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);
+				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, segmentLength], maxForce);
 				// hinge.setStiffness(armLengthStiffness);
 				// hinge.setRelaxation(armLengthRelaxation);
 				this.hinges.push(hinge);
@@ -161,7 +161,9 @@ class SimpleGame {
 
 		this.game.world.setBounds(0, 0, 1920, 1920);
 
-		this.mouth = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "mouth");
+		console.log(this.game.world.centerX, this.game.world.centerY);
+
+		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
 		this.mouth.bringToTop();
 
 		// this.mouth.scale.set(0.1);
