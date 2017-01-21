@@ -93,7 +93,10 @@ class Arm {
 
 	update() {
 		var now = this.game.time.now / 1000;
-		this.springs.forEach(s => s.data.restAngle = Math.sin(2 * Math.PI * now * (0.1+this.armIndex*0.047)) * 0.05);
+		this.springs.forEach(s => {
+			// Flex the arm slowly and gently, and out of sync with the other arms
+			s.data.restAngle = Math.sin(2 * Math.PI * now * (0.1+this.armIndex*0.047)) * 0.05
+		});
 	}
 
 	attachTo(body: Phaser.Physics.P2.Body, rotation: number) {
