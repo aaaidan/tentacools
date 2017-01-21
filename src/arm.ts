@@ -1,5 +1,3 @@
-const ARM_TOTAL: number = 3;
-
 class Arm {
 
 	static armIdCounter: number = 0;
@@ -20,7 +18,7 @@ class Arm {
 		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
-		const angle = Math.PI * 2 * (armIndex / ARM_TOTAL);
+		const angle = Math.PI * 2 * (armIndex / armsTotal);
 		const segmentLength = 10;
 		const totalMass = 1;
 		const segmentCount = 15;
@@ -29,8 +27,8 @@ class Arm {
 			let x = Math.cos(angle) * i * segmentLength + game.world.centerX;
 			let y = Math.sin(angle) * i * segmentLength + game.world.centerY;
 			var ball: Phaser.Sprite = this.game.add.sprite(x, y, "segment");
-			ball.tint = armIndex / ARM_TOTAL * 0x00ffff + 1 /armIndex / ARM_TOTAL * 0xff0000;
-			ball.scale.set(1 / (1 + i / (segmentCount - 1)));
+			ball.tint = armIndex / armsTotal * 0x00ffff + 1 /armIndex / armsTotal * 0xff0000;
+			ball.scale.set(1.5 / (1 + (i / (segmentCount - 1))*2 ));
 			this.balls.push(ball);
 		}
 		this.game.physics.p2.enable(this.balls, SHOW_PHYSICS_DEBUG);
@@ -40,9 +38,12 @@ class Arm {
 		this.balls.forEach(b => {
 			b.body.mass = totalMass / segmentCount;
 			b.body.collideWorldBounds = false;
-
-		if (lastBall) {
-				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);
+			b.body.setCircle(b.width / 2);
+			if (lastBall) {
+				var hinge = this.game.physics.p2.createRevoluteConstraint(
+					b, [0, 0],
+					lastBall, [b.x - lastBall.x, b.y - lastBall.y],
+					maxForce);
 				// hinge.setStiffness(armLengthStiffness);
 				// hinge.setRelaxation(armLengthRelaxation);
 				this.hinges.push(hinge);
@@ -56,13 +57,11 @@ class Arm {
 		stiffness.addListener((value) => {
 			this.springs.forEach(s => {
 				s.data.stiffness = value;
-				console.log("stiff", value, this.id);
 			});
 		});
 		damping.addListener((value) => {
 			this.springs.forEach(s => {
 				s.data.damping = value;
-				console.log("damp", value, this.id);
 			});
 		});
 		armLengthStiffness.addListener(value => {
@@ -75,6 +74,8 @@ class Arm {
 				h.setRelaxation(value);
 			})
 		});
+		this.tip.body.force.x = Math.random() - 0.5 * 2000;
+		this.tip.body.force.y = Math.random() - 0.5 * 2000;
 	}
 
 	getBase() {
@@ -85,6 +86,6 @@ class Arm {
 		this.game.physics.p2.createRevoluteConstraint(body, [0, 0], this.getBase(), [0, 0], maxForce);
 		const USELESS = 0; // setting rest rotation in constructor doesn't work properly for some mysterious reason
 		var rotationSpring = this.game.physics.p2.createRotationalSpring(body, this.getBase(), USELESS, 120, 5);
-		rotationSpring.data.restAngle = rotation;
+		// rotationSpring.data.restAngle = 0;
 	}
 }
