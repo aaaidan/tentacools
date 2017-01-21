@@ -20,7 +20,8 @@ var tweaks = {
 	mouthMass: 5,
 	tentacleForce: 140,
 	armLengthStiffness: 40,
-	armLengthRelaxation: 30
+	armLengthRelaxation: 30,
+	cameraScale: 1
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
@@ -48,6 +49,10 @@ extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
 
 var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
 extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
+
+var cameraScale = gui.add(tweaks, 'cameraScale', 0.5, 3);
+
+
 
 function setPivotCenter(image: Phaser.Image) {
 	image.pivot.set(image.width / 2, image.height / 2);
@@ -153,8 +158,11 @@ class SimpleGame {
 		// window["eyes"] = this.eyes;  // for in-browser debug
 
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
-		this.game.camera.scale.set(0.9);
 		this.game.camera.follow(this.playerBody);
+
+		cameraScale.onChange(scale => {
+			this.game.camera.scale.setTo(scale);
+		});
 
 		// Enabled physics on mouth
 		this.game.physics.p2.enable([this.playerBody, this.mouthGod], SHOW_PHYSICS_DEBUG);
