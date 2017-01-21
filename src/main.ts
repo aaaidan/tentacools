@@ -62,6 +62,8 @@ class SimpleGame {
 	eyes: Eye[];
 	armList: Arm[];
 
+	crab: Crab;
+
 	keyList = [];
 
 	allFood: Phaser.Group;
@@ -181,6 +183,8 @@ class SimpleGame {
 		}
 		setupCursors();
 
+		//Enemy
+		this.crab = new Crab(this.game, this.game.world.centerX-200, this.game.world.centerY-200, this.mouth);
 		// Collision groups
 		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
@@ -365,7 +369,7 @@ class SimpleGame {
 		this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
 		this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
-
+		this.crab.update();
 		this.playerEnergy.decreaseEnergy(1);
 	}
 }
