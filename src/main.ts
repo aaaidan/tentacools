@@ -6,8 +6,7 @@ const SHOW_PHYSICS_DEBUG = true || true;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
-// const foodCount = 200;
-const foodCount = 0;
+const foodCount = 200;
 
 var tweaks = {
 	stiffness: 10,
