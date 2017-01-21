@@ -39,7 +39,7 @@ class Arm {
 		var lastBall: Phaser.Sprite = null;
 		this.balls.forEach(b => {
 			b.body.mass = totalMass / segmentCount;
-			b.body.collideWorldBounds = false;
+			b.body.collideWorldBounds = true;
 
 		if (lastBall) {
 				var hinge = this.game.physics.p2.createRevoluteConstraint(b, [0, 0], lastBall, [0, 20], maxForce);

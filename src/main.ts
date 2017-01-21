@@ -5,7 +5,7 @@ const SHOW_PHYSICS_DEBUG = true || true;
 
 declare const dat: any;
 const gui = new dat.GUI();
-const armsTotal = 5;
+const armsTotal = 3;
 
 
 var tweaks = {
@@ -76,6 +76,7 @@ class SimpleGame {
 
 		// Enabled physics on mouth
 		this.game.physics.p2.enable([this.mouth], SHOW_PHYSICS_DEBUG);
+        this.game.physics.p2.setImpactEvents(true);
 
 		// setup behaviour of individual bits
 
@@ -116,6 +117,28 @@ class SimpleGame {
 			}
 		}
 		setupCursors();
+		
+		// Collision groups
+		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
+        var explosiveCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var mouthCollisionGroup = this.game.physics.p2.createCollisionGroup();
+		var armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[] = [];
+
+		this.game.physics.p2.updateBoundsCollisionGroup();
+
+		
+		for (let i = 0; i < armsTotal; i++) {
+			armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
+		}
+
+		var foodHitArm = (playerBody, foodBody) => {
+			foodBody.sprite.alpha -= 0.1;
+		};
+
+		var foodHitMouth = (playerBody, foodBody) => {
+			console.log("Food in mouth");
+		};
 
 		var createNoodlyAppendage = (armIndex) => {
 			var arm = new Arm(this.game, armIndex);
@@ -123,43 +146,34 @@ class SimpleGame {
 			arm.attachTo(this.mouth.body, 2 * Math.PI * (armIndex / armsTotal));
 			return arm;
 		}
+
 		this.armList = [];
 		for (let a = 0; a < armsTotal; ++a) {
 			this.armList[a] = createNoodlyAppendage(a);
+			this.armList[a].balls.forEach(ball => {
+				ball.body.setCollisionGroup(armsCollisionGroups[a]);
+				ball.body.collides(foodCollisionGroup, foodHitArm);
+			});
 		}
+
+		this.mouth.body.setCollisionGroup(mouthCollisionGroup);
+		this.mouth.body.collides(foodCollisionGroup, foodHitMouth)
 
 		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
 
 		// Collision stuff
-		this.game.physics.p2.setImpactEvents(true);
-
-		var foodCollisionGroup = this.game.physics.p2.createCollisionGroup();
-		var starfishCollisionGroup = this.game.physics.p2.createCollisionGroup();
-		this.game.physics.p2.updateBoundsCollisionGroup();
 		
 		var allFood = this.game.add.group();
 		allFood.enableBody = true;
 		allFood.physicsBodyType = Phaser.Physics.P2JS;
 
-		for (var i = 0; i < 200; i++)
-		{
+		for (var i = 0; i < 200; i++) {
 			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(40, 40);
 			food.body.setCollisionGroup(foodCollisionGroup);
-
-			food.body.collides([foodCollisionGroup, starfishCollisionGroup]);
+			food.body.collides(armsCollisionGroups.concat(foodCollisionGroup));
 		}
 
-		var foodHit = (playerBody, foodBody) => {
-			foodBody.sprite.alpha -= 0.1;
-		};
-
-		this.armList.forEach(arm => {
-			arm.balls.forEach(ball => {
-				ball.body.setCollisionGroup(starfishCollisionGroup);
-				ball.body.collides(foodCollisionGroup, foodHit);
-			});
-		});
 		//End collision stuff
 
 		window["game"] = this;
