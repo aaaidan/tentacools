@@ -1,20 +1,20 @@
 /// <reference path="../tsd/phaser.d.ts"/>
 
 const maxForce = 2000; // who knows
-const SHOW_PHYSICS_DEBUG = true || true;
-
+const SHOW_PHYSICS_DEBUG = true;
+const MOTION_FORCE = 5;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
-
+const foodCount = 200;
 
 var tweaks = {
 	stiffness: 10,
 	damping: 500,
-	mouthMass: 25,
-	tentacleForce: 300,
+	mouthMass: 10,
+	tentacleForce: 100,
 	armLengthStiffness: 30,
-	armLengthRelaxation: 10  // 35?
+	armLengthRelaxation: 10
 }
 
 function extendGuiParameterToSupportMultipleListeners(guiParam) {
@@ -57,7 +57,7 @@ class SimpleGame {
 	}
 	preload() {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
-	//	this.game.load.image('segment', 'assets/segment.png');
+		//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
 	create() {
@@ -143,7 +143,8 @@ class SimpleGame {
 		var createNoodlyAppendage = (armIndex) => {
 			var arm = new Arm(this.game, armIndex);
 			this.game.world.add(arm.sprite);
-			arm.attachTo(this.mouth.body, 2 * Math.PI * (armIndex / armsTotal));
+			let appendageRotation = 2 * Math.PI * (armIndex / armsTotal);
+			arm.attachTo(this.mouth.body, appendageRotation);
 			return arm;
 		}
 
@@ -159,42 +160,42 @@ class SimpleGame {
 		this.mouth.body.setCollisionGroup(mouthCollisionGroup);
 		this.mouth.body.collides(foodCollisionGroup, foodHitMouth)
 
-		//this.mouth.body.rotateRight(3000); // temp hack, counter inertial twisting of initialisation of appendages
-
-		// Collision stuff
-		
 		var allFood = this.game.add.group();
 		allFood.enableBody = true;
 		allFood.physicsBodyType = Phaser.Physics.P2JS;
 
-		for (var i = 0; i < 200; i++) {
+		for (var i = 0; i < foodCount; i++) {
 			var food = allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(40, 40);
 			food.body.setCollisionGroup(foodCollisionGroup);
 			food.body.collides(armsCollisionGroups.concat(foodCollisionGroup));
 		}
 
-		//End collision stuff
-
 		window["game"] = this;
 	}
 
 	update() {
-		function forceBody(arm, keys, forceAmt) {
+		function anglise(tip: Phaser.Sprite, direction: number, force: number) {
+			let rotation = tip.rotation + direction;
+			tip.body.force.x = Math.cos(rotation) * force;
+			tip.body.force.y = Math.sin(rotation) * force;
+			console.log(tip.body.force.x);
+		}
+
+		function forceBody(tip: Phaser.Sprite, keys, forceAmt) {
+
 			if (keys.left.isDown) {
-				arm.body.force.x = -forceAmt;
-				// arm.body.rotateLeft(forceAmt)
+				anglise(tip, 0, forceAmt);
 			}
 			else if (keys.right.isDown) {
-				arm.body.force.x = forceAmt;
-				// arm.body.rotateRight(forceAmt);
+				anglise(tip, Math.PI, forceAmt);
 			}
 
 			if (keys.up.isDown) {
-				arm.body.force.y = -forceAmt;
+				anglise(tip, Math.PI / 2, forceAmt * MOTION_FORCE)
 			}
 			else if (keys.down.isDown) {
-				arm.body.force.y = forceAmt;
+				anglise(tip, Math.PI * 3 / 2, forceAmt * MOTION_FORCE)
 			}
 
 		}
