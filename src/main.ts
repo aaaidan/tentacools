@@ -55,6 +55,8 @@ class SimpleGame {
 	allFood: Phaser.Group;
 	urchinGroup: Phaser.Group; //Declare ALL the globals
 
+	playerEnergy: PlayerEnergy;
+
 	armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[];
 
 	constructor() {
@@ -66,6 +68,7 @@ class SimpleGame {
 		this.game.load.image('background', 'assets/debug-grid-1920x1920.png');
 		this.game.load.image('food', 'assets/food.gif');
 		this.game.load.image('shell', 'assets/shell.gif');
+		this.game.load.image('energy', 'assets/energy.gif')
 		//	this.game.load.image('segment', 'assets/segment.png');
 	}
 
@@ -76,6 +79,8 @@ class SimpleGame {
 		this.game.world.setBounds(0, 0, 1920, 1920);
 
 		console.log(this.game.world.centerX, this.game.world.centerY);
+
+		this.playerEnergy = new PlayerEnergy(this.game, 1000);
 
 		this.mouth = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, "mouth");
 		this.mouth.bringToTop();
@@ -258,6 +263,8 @@ class SimpleGame {
 			forceBody(this.armList[a].tip, this.keyList[a], tweaks.tentacleForce);
 		}
 		
+
+		this.playerEnergy.decreaseEnergy(1);
 	}
 }
 
