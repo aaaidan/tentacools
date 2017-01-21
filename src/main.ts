@@ -9,14 +9,14 @@ const RECOIL_DURATION_MS = 150;
 declare const dat: any;
 const gui = new dat.GUI();
 const armsTotal = 3;
-const foodCount = 100;
-const urchinCount = 50;
+const foodCount = 10;
+const urchinCount = 10;
 const shellCount = 75
 
 var tweaks = {
 	stiffness: 30,
 	damping: 500,
-	mouthMass: 10,
+	mouthMass: 5,
 	tentacleForce: 140,
 	armLengthStiffness: 40,
 	armLengthRelaxation: 30
