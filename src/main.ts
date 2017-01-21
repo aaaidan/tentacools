@@ -64,10 +64,10 @@ class Arm {
 
 		const segmentLength = 10;
 		const totalMass = 1;
-		const ballCount = 10;
-		for (var i=0; i<ballCount; i++) {
+		const segmentCount = 15;
+		for (var i=0; i<segmentCount; i++) {
 			var ball:Phaser.Sprite = this.game.add.sprite(0, i * segmentLength, spriteName);
-			ball.scale.set( 1 / (1 + i/(ballCount-1)) );
+			ball.scale.set( 1 / (1 + i/(segmentCount-1)) );
 			this.balls.push( ball );
 		}
 		this.game.physics.p2.enable( this.balls, SHOW_PHYSICS_DEBUG );
@@ -75,7 +75,7 @@ class Arm {
 
 		var lastBall:Phaser.Sprite = null;
 		this.balls.forEach( b => {
-			b.body.mass = totalMass / ballCount;
+			b.body.mass = totalMass / segmentCount;
 			b.body.collideWorldBounds = false;			
 			if (lastBall) {
 				var hinge = this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
