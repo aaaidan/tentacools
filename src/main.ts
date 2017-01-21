@@ -55,6 +55,8 @@ class SimpleGame {
 	allFood: Phaser.Group;
 	urchinGroup: Phaser.Group; //Declare ALL the globals
 
+	armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[];
+
 	constructor() {
 		this.game = new Phaser.Game(640, 480, Phaser.AUTO, 'content', {
 			create: this.create, preload: this.preload, update: this.update
@@ -130,13 +132,13 @@ class SimpleGame {
 		var shellCollisionGroup = this.game.physics.p2.createCollisionGroup();
         var urchinCollisionGroup = this.game.physics.p2.createCollisionGroup();
 		var mouthCollisionGroup = this.game.physics.p2.createCollisionGroup();
-		var armsCollisionGroups: Phaser.Physics.P2.CollisionGroup[] = [];
+		this.armsCollisionGroups = [];
 
 		this.game.physics.p2.updateBoundsCollisionGroup();
 
 		
 		for (let i = 0; i < armsTotal; i++) {
-			armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
+			this.armsCollisionGroups.push(this.game.physics.p2.createCollisionGroup());
 		}
 
 		// var foodHitArm = (playerBody, foodBody) => {
@@ -154,6 +156,8 @@ class SimpleGame {
 		var urchinHitPlayer = (playerBody, urchinBody) => {
 			// Do reactionary things
 			console.log("Hit urchin");
+
+
 		};
 
 		var createNoodlyAppendage = (armIndex) => {
@@ -168,9 +172,15 @@ class SimpleGame {
 		for (let a = 0; a < armsTotal; ++a) {
 			this.armList[a] = createNoodlyAppendage(a);
 			this.armList[a].balls.forEach(ball => {
-				ball.body.setCollisionGroup(armsCollisionGroups[a]);
+				ball.body.setCollisionGroup(this.armsCollisionGroups[a]);
 				ball.body.collides([foodCollisionGroup, shellCollisionGroup]);
 				ball.body.collides(urchinCollisionGroup, urchinHitPlayer);
+
+				for (let i = 0; i < armsTotal; i++) { // There must be a javascript way todo this - find later.
+					if (i != a) {
+						ball.body.collides(this.armsCollisionGroups[i]);
+					}
+				}
 			});
 		}
 
@@ -186,7 +196,7 @@ class SimpleGame {
 			var food = this.allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
 			food.body.setRectangle(20, 20);
 			food.body.setCollisionGroup(foodCollisionGroup);
-			food.body.collides(armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
+			food.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 			food.scale.setTo(0.5, 0.5);
 		}
 
@@ -198,7 +208,7 @@ class SimpleGame {
 			var urchin = this.urchinGroup.create(this.game.world.randomX, this.game.world.randomY, 'urchin');
 			urchin.body.setRectangle(30, 30);
 			urchin.body.setCollisionGroup(urchinCollisionGroup);
-			urchin.body.collides(armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
+			urchin.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 			urchin.scale.setTo(0.75, 0.75);
 		}
 
@@ -212,7 +222,7 @@ class SimpleGame {
 			var shell = shellGroup.create(this.game.world.randomX, this.game.world.randomY, 'shell');
 			shell.body.setRectangle(40, 40);
 			shell.body.setCollisionGroup(shellCollisionGroup);
-			shell.body.collides([foodCollisionGroup, shellCollisionGroup, mouthCollisionGroup, urchinCollisionGroup].concat(armsCollisionGroups));
+			shell.body.collides([foodCollisionGroup, shellCollisionGroup, mouthCollisionGroup, urchinCollisionGroup].concat(this.armsCollisionGroups));
 		}
 
 		window["game"] = this;
