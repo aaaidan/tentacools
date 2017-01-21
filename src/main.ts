@@ -5,7 +5,7 @@ const SHOW_PHYSICS_DEBUG = false;
 const MOTION_FORCE = 2;
 declare const dat: any;
 const gui = new dat.GUI();
-const armsTotal = 2;
+const armsTotal = 3;
 const foodCount = 100;
 const urchinCount = 50;
 const shellCount = 75

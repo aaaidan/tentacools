@@ -24,7 +24,7 @@ class Arm {
 		this.hinges = [];
 		this.sprite = new Phaser.Group(this.game);
 
-		const angle = Math.PI * 2 * (armIndex / armsTotal);
+		const angle = Math.PI * 2 * (armIndex / armsTotal) ;
 		const segmentLength = 15;
 		const totalMass = 1;
 		const segmentCount = 15;
