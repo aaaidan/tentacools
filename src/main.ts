@@ -2,10 +2,36 @@
 
 const maxForce = 2000; // who knows
 const SHOW_PHYSICS_DEBUG = false;
-// const gui = new dat.GUI();
+
+declare const dat:any;
+const gui = new dat.GUI();
+
+var tweaks = {
+	stiffness: 80,
+	damping: 500
+}
+
+function extendGuiParameterToSupportMultipleListeners(guiParam) {
+	guiParam.___changeCallbacks___ = [];
+	guiParam.addListener = (function(callback) {
+		this.___changeCallbacks___.push(callback);
+	}).bind(guiParam);
+	guiParam.onChange((function(val) {
+		this.___changeCallbacks___.forEach(cb => cb(val) );
+	}).bind(guiParam));
+}
+
+var stiffness = gui.add(tweaks, 'stiffness', 10, 200);
+extendGuiParameterToSupportMultipleListeners(stiffness);
+
+var damping = gui.add(tweaks, 'damping', 1, 500);
+extendGuiParameterToSupportMultipleListeners(damping);
 
 class Arm {
 
+	static armIdCounter: number = 0;
+
+	id: number;
 	sprite: Phaser.Group;
 	balls: Phaser.Sprite[];
 	game: Phaser.Game;
@@ -13,6 +39,8 @@ class Arm {
 	springs: any[];
 
 	constructor(game:Phaser.Game, spriteName:String) {
+		this.id = Arm.armIdCounter++;
+
 		this.game = game;
 		this.balls = [];
 		this.springs = [];
@@ -35,10 +63,23 @@ class Arm {
 			b.body.collideWorldBounds = false;			
 			if (lastBall) {
 				this.game.physics.p2.createRevoluteConstraint( b, [0,0], lastBall, [0,20], maxForce );
-				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, 80, 15 );
+				var spring = this.game.physics.p2.createRotationalSpring( b, lastBall, 0, tweaks.stiffness, tweaks.damping );
 				this.springs.push(spring);
 			}
 			lastBall = b;
+		});
+
+		stiffness.addListener((value) => {
+			this.springs.forEach( s => {
+				s.data.stiffness = value;
+				console.log("stiff", value, this.id);
+			});
+		});
+		damping.addListener((value) => {
+			this.springs.forEach( s => {
+				s.data.damping = value;
+				console.log("damp", value, this.id);
+			});
 		});
 	}
 
