@@ -176,7 +176,7 @@ class SimpleGame {
 		// setup behaviour of individual bits
 
 		this.playerBody.body.mass = tweaks.playerBodyMass;
-		this.playerBody.body.setCircle(this.playerBody.width * playerBodyScale);
+		this.playerBody.body.setCircle((this.playerBody.width / 2) * playerBodyScale);
 
 		this.mouthGod.body.mass = 1000;;
 		// this.mouthGod.body.setRectangle(this.mouthGod.width * 2, 90 * 2);
@@ -302,7 +302,7 @@ class SimpleGame {
 			food.scale.setTo(0.2, 0.2);
 			food.body.setCircle(food.width / 2 * 0.8, 0, 0, 0);
 			food.body.setCollisionGroup(foodCollisionGroup);
-			food.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
+			food.body.collides(this.armsCollisionGroups.concat([playerBodyCollisionGroup, foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
 		}
 
 		this.urchinGroup = this.game.add.group();
@@ -314,7 +314,7 @@ class SimpleGame {
 			urchin.scale.setTo(0.2);
 			urchin.body.setCircle(urchin.width / 2 * 0.8, 0, 0, 0);
 			urchin.body.setCollisionGroup(urchinCollisionGroup);
-			urchin.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
+			urchin.body.collides(this.armsCollisionGroups.concat([playerBodyCollisionGroup, foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
 		}
 
 		// Don't really need to worry about shells after creation
