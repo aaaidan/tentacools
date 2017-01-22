@@ -265,7 +265,7 @@ class SimpleGame {
 		}
 
 		//Enemy
-		this.crab = new Crab(this.game, this.game.world.centerX-200, this.game.world.centerY-200, this.playerBody);
+		this.crab = new Crab(this.game, this.game.world.centerX+400, this.game.world.centerY+400, this.playerBody);
 		this.crab.base.body.setCollisionGroup(urchinCollisionGroup);
 		this.crab.base.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup]));
 
