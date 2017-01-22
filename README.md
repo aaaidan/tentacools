@@ -8,7 +8,7 @@ This is a 3 player game, so you'll want to get 2 of your closest friends togethe
 
 ## Installing this
 
-If the above link doesn't work, and you still want to experience this derangement, you will need to install it on your computer.
+If the above link doesn't work, and you still want to experience this derangement, you will need to set it up on your computer.
 
 Since this game is written in [Phaser](https://phaser.io), it needs to be hosted on a static webserver to be played. Sorry about that. It's worth it, I promise.
 
