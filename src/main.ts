@@ -129,7 +129,7 @@ class SimpleGame {
 		this.game.load.image('doodad07', 'assets/background-doodad-07.png');
 		this.game.load.image('doodad08', 'assets/background-doodad-08.png');
 		
-		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 87, 91);
+		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 173, 178);
 
 		this.game.load.image('title', 'assets/title.png');
 	}
@@ -142,15 +142,15 @@ class SimpleGame {
 
 		console.log(this.game.world.centerX, this.game.world.centerY);
 
-		let spawnOffset = 200;
+		let spawnOffset = 300;
 
 		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, 'mouth', 1);
-		this.mouthGod.scale.set(2);
 
 		this.mouthGodEatAnimation = this.mouthGod.animations.add('eat');
 
 		let playerBodyScale = 0.65;
-		this.playerBody = this.game.add.sprite(this.mouthGod.x + spawnOffset, this.mouthGod.y + spawnOffset, "segment");
+		let playerSpawnOffset = 150;
+		this.playerBody = this.game.add.sprite(this.mouthGod.x + playerSpawnOffset, this.mouthGod.y + playerSpawnOffset, "segment");
 		this.playerBody.scale.set(playerBodyScale); 
 
 
@@ -190,7 +190,7 @@ class SimpleGame {
 		// setup behaviour of individual bits
 
 		this.playerBody.body.mass = tweaks.playerBodyMass;
-		this.playerBody.body.setCircle(this.playerBody.width * playerBodyScale);
+		this.playerBody.body.setCircle((this.playerBody.width / 2) * playerBodyScale);
 
 		this.mouthGod.body.mass = 1000;;
 		// this.mouthGod.body.setRectangle(this.mouthGod.width * 2, 90 * 2);
@@ -316,7 +316,7 @@ class SimpleGame {
 			food.scale.setTo(0.2, 0.2);
 			food.body.setCircle(food.width / 2 * 0.8, 0, 0, 0);
 			food.body.setCollisionGroup(foodCollisionGroup);
-			food.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
+			food.body.collides(this.armsCollisionGroups.concat([playerBodyCollisionGroup, foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
 		}
 
 		this.urchinGroup = this.game.add.group();
@@ -328,7 +328,7 @@ class SimpleGame {
 			urchin.scale.setTo(0.2);
 			urchin.body.setCircle(urchin.width / 2 * 0.8, 0, 0, 0);
 			urchin.body.setCollisionGroup(urchinCollisionGroup);
-			urchin.body.collides(this.armsCollisionGroups.concat([foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
+			urchin.body.collides(this.armsCollisionGroups.concat([playerBodyCollisionGroup, foodCollisionGroup, shellCollisionGroup, urchinCollisionGroup, this.mouthCoillisionGroup]));
 		}
 
 		// Don't really need to worry about shells after creation
