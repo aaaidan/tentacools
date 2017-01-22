@@ -60,6 +60,11 @@ function setPivotCenter(image: Phaser.Image) {
 }
 
 class SimpleGame {
+
+	feedScreen1: GameScreen;
+	feedScreen2: GameScreen;
+	feedScreen3: GameScreen;
+
 	game: Phaser.Game;
 
 	title: Phaser.Sprite;
@@ -148,6 +153,10 @@ class SimpleGame {
 	}
 
 	create() {
+
+		this.feedScreen1 = new GameScreen(this.game, "screen-feedme1", 2000);
+		this.feedScreen2 = new GameScreen(this.game, "screen-feedme2", 2000);
+		this.feedScreen3 = new GameScreen(this.game, "screen-feedme3", 2000);
 
 		this.game.add.tileSprite(0, 0, 1920, 1920, 'background');
 
@@ -270,6 +279,17 @@ class SimpleGame {
 			foodBody.destroy();
 
 			this.foodEatenCount++;
+
+			switch(this.foodEatenCount) {
+				case 1: 
+					this.feedScreen2.show();
+					break;
+				case 2: 
+					this.feedScreen3.show();
+					break;
+				default:
+					console.log("food eaten: " + this.foodEatenCount);
+			}
 		};
 
 		this.urchinReaction = false;
@@ -367,20 +387,20 @@ class SimpleGame {
 		// instructions
 		this.instructions = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "instructions");
 		this.instructions.pivot.set(this.instructions.width / 2, this.instructions.height / 2);
-		this.instructions.scale.set(0.8);
+		// this.instructions.scale.set(0.8);
 		this.instructions.alpha = 0;
 
 		// controls
 		this.controls = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "controls");
 		this.controls.pivot.set(this.controls.width / 2, this.controls.height / 2);
-		this.controls.scale.set(0.8);
+		// this.controls.scale.set(0.8);
 		this.controls.alpha = 0;
 
 		// success
 		this.success = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "success");
 		this.success.pivot.set(this.success.width / 2, this.success.height / 2);
-		this.success.scale.set(0.8);
-		this.success.alpha = 0; 
+		// this.success.scale.set(0.8);
+		this.success.alpha = 0;
 
 		// Sort out z-index of important items
 		this.playerBody.bringToTop();
@@ -421,8 +441,11 @@ class SimpleGame {
 			if (this.controls.alpha < 0) {
 				this.game.world.removeChild(this.controls);
 				this.controls = null;
+
+				this.feedScreen1.show();
 			}
 		}
+
 
 		if (this.foodEatenCount >= maxFoodToWin && !this.won) {	
 			this.won = true;
