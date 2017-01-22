@@ -115,7 +115,7 @@ class SimpleGame {
 		this.game.load.image('doodad07', 'assets/background-doodad-07.png');
 		this.game.load.image('doodad08', 'assets/background-doodad-08.png');
 		
-		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 87, 91);
+		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 173, 178);
 
 		this.game.load.image('title', 'assets/title.png');
 	}
@@ -131,7 +131,6 @@ class SimpleGame {
 		let spawnOffset = 300;
 
 		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, 'mouth', 1);
-		this.mouthGod.scale.set(2);
 
 		this.mouthGodEatAnimation = this.mouthGod.animations.add('eat');
 
