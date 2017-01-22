@@ -65,6 +65,7 @@ class SimpleGame {
 	title: Phaser.Sprite;
 
 	mouthGod: Phaser.Sprite;
+	mouthGodEatAnimation: Phaser.Animation;
 	mouthLips: Phaser.Image;
 	eyes: Eye[];
 
@@ -114,6 +115,7 @@ class SimpleGame {
 		this.game.load.image('doodad07', 'assets/background-doodad-07.png');
 		this.game.load.image('doodad08', 'assets/background-doodad-08.png');
 		
+		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 87, 91);
 
 		this.game.load.image('title', 'assets/title.png');
 	}
@@ -128,8 +130,10 @@ class SimpleGame {
 
 		let spawnOffset = 200;
 
-		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, "mouth-bite1");
+		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, 'mouth', 1);
 		this.mouthGod.scale.set(2);
+
+		this.mouthGodEatAnimation = this.mouthGod.animations.add('eat');
 
 		let playerBodyScale = 0.65;
 		this.playerBody = this.game.add.sprite(this.mouthGod.x + spawnOffset, this.mouthGod.y + spawnOffset, "segment");
@@ -231,6 +235,10 @@ class SimpleGame {
 
 		var foodHitMouth = (playerBody, foodBody) => {
 			let sprite = foodBody.sprite;
+			
+			this.mouthGodEatAnimation.stop();
+			this.mouthGodEatAnimation.play(18);
+
 			sprite.kill(); if (sprite.group) { sprite.group.remove(sprite); } else if (sprite.parent) { sprite.parent.removeChild(sprite); }
 			foodBody.destroy();
 
@@ -401,6 +409,10 @@ class SimpleGame {
 		// this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
 		this.crab.update();
+
+		if (this.mouthGodEatAnimation.isFinished) {
+			this.mouthGodEatAnimation.play(1);
+		}
 	}
 }
 
