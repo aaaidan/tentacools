@@ -9,9 +9,9 @@ const RECOIL_DURATION_MS = 150;
 declare const dat: any;
 // const gui = new dat.GUI();
 const armsTotal = 3;
-const foodCount = 100;
-const urchinCount = 5;
-const shellCount = 7;
+const foodCount = 12;
+const urchinCount = 7;
+const shellCount = 10;
 const maxFoodToWin = 3;
 
 var tweaks = {
@@ -66,6 +66,8 @@ class SimpleGame {
 	success: Phaser.Sprite;
 	controls: Phaser.Sprite;
 	instructions: Phaser.Sprite;
+
+	won: boolean;
 
 	mouthGod: Phaser.Sprite;
 	mouthGodEatAnimation: Phaser.Animation;
@@ -374,6 +376,12 @@ class SimpleGame {
 		this.controls.scale.set(0.8);
 		this.controls.alpha = 0;
 
+		// success
+		this.success = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "success");
+		this.success.pivot.set(this.success.width / 2, this.success.height / 2);
+		this.success.scale.set(0.8);
+		this.success.alpha = 0; 
+
 		// Sort out z-index of important items
 		this.playerBody.bringToTop();
 		this.title.bringToTop();
@@ -416,8 +424,12 @@ class SimpleGame {
 			}
 		}
 
-		if (this.foodEatenCount >= maxFoodToWin) {
-			console.log("You have won");
+		if (this.foodEatenCount >= maxFoodToWin && !this.won) {	
+			this.won = true;
+
+			this.success.alpha = 1;
+			this.success.fixedToCamera = true;
+			this.success.bringToTop();
 		}
 
 		function anglise(tip: Phaser.Sprite, direction: number, force: number): Phaser.Point {
@@ -468,7 +480,10 @@ class SimpleGame {
 		// this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
 		// this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
-		this.crab.update();
+
+		if (this.game.time.now > 12000) {
+			this.crab.update();
+		}
 
 		if (this.mouthGodEatAnimation.isFinished) {
 			this.mouthGodEatAnimation.play(1);
