@@ -162,13 +162,12 @@ class SimpleGame {
 
 		this.game.world.setBounds(0, 0, 1920, 1920);
 
-		console.log(this.game.world.centerX, this.game.world.centerY);
-
 		let spawnOffset = 300;
 
 		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, 'mouth', 1);
 
 		this.mouthGodEatAnimation = this.mouthGod.animations.add('eat');
+		this.mouthGodEatAnimation.play(1);
 
 		let playerBodyScale = 0.65;
 		let playerSpawnOffset = 150;
