@@ -128,7 +128,7 @@ class SimpleGame {
 
 		console.log(this.game.world.centerX, this.game.world.centerY);
 
-		let spawnOffset = 200;
+		let spawnOffset = 300;
 
 		this.mouthGod = this.game.add.sprite(spawnOffset, spawnOffset, 'mouth', 1);
 		this.mouthGod.scale.set(2);
@@ -136,7 +136,8 @@ class SimpleGame {
 		this.mouthGodEatAnimation = this.mouthGod.animations.add('eat');
 
 		let playerBodyScale = 0.65;
-		this.playerBody = this.game.add.sprite(this.mouthGod.x + spawnOffset, this.mouthGod.y + spawnOffset, "segment");
+		let playerSpawnOffset = 150;
+		this.playerBody = this.game.add.sprite(this.mouthGod.x + playerSpawnOffset, this.mouthGod.y + playerSpawnOffset, "segment");
 		this.playerBody.scale.set(playerBodyScale); 
 
 
