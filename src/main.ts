@@ -115,6 +115,11 @@ class SimpleGame {
 		this.game.load.image('food-gib8', 'assets/boigah-gib-36.png');
 		this.game.load.image('food-gib9', 'assets/boigah-gib-37.png');
 
+		this.game.load.image('screen-feedme1', 'assets/screen-feedme_1.png');
+		this.game.load.image('screen-feedme2', 'assets/screen-feedme_2.png');
+		this.game.load.image('screen-feedme3', 'assets/screen-feedme_3.png');
+		this.game.load.image('screen-feedme4', 'assets/screen-feedme_4.png');
+
 		this.game.load.image('doodad01', 'assets/background-doodad-01.png');
 		this.game.load.image('doodad02', 'assets/background-doodad-02.png');
 		this.game.load.image('doodad03', 'assets/background-doodad-03.png');
