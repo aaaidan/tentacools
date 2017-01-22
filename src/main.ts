@@ -96,10 +96,13 @@ class SimpleGame {
 		this.game.load.image('eyeball-base', 'assets/eyeball-base.png');
 		this.game.load.image('eyeball-iris', 'assets/eyeball-iris.png');
 		this.game.load.image('eyeball-highlight', 'assets/eyeball-highlight.png');
-		this.game.load.image('mouth-closed', 'assets/mouth-closed.png');
-		this.game.load.image('mouth-bite0', 'assets/mouth-bite0.png');
-		this.game.load.image('mouth-bite1', 'assets/mouth-bite1.png');
-		this.game.load.image('mouth-bite2', 'assets/mouth-bite2.png');
+		this.game.load.image('mouth-closed', 'assets/mouth_closed.png');
+		this.game.load.image('mouth-closed2', 'assets/mouth_closed2.png');
+		this.game.load.image('mouth-bite0.0', 'assets/mouth_bite0.0.png');
+		this.game.load.image('mouth-bite0.5', 'assets/mouth_bite0.5.png');
+		this.game.load.image('mouth-bite1.0', 'assets/mouth_bite1.0.png');
+		this.game.load.image('mouth-bite1.5', 'assets/mouth_bite1.5.png');
+		this.game.load.image('mouth-bite2', 'assets/mouth_bite2.0.png');
 
 		this.game.load.image('food', 'assets/boigah.png');
 		this.game.load.image('shell', 'assets/shell.png');
