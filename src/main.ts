@@ -105,6 +105,15 @@ class SimpleGame {
 		this.game.load.image('shell', 'assets/shell.png');
 		this.game.load.image('energy', 'assets/energy.gif');
 		this.game.load.image('urchin', 'assets/urchin.png');
+		this.game.load.image('food-gib1', 'assets/boigah-gib-29.png');
+		this.game.load.image('food-gib2', 'assets/boigah-gib-30.png');
+		this.game.load.image('food-gib3', 'assets/boigah-gib-31.png');
+		this.game.load.image('food-gib4', 'assets/boigah-gib-32.png');
+		this.game.load.image('food-gib5', 'assets/boigah-gib-33.png');
+		this.game.load.image('food-gib6', 'assets/boigah-gib-34.png');
+		this.game.load.image('food-gib7', 'assets/boigah-gib-35.png');
+		this.game.load.image('food-gib8', 'assets/boigah-gib-36.png');
+		this.game.load.image('food-gib9', 'assets/boigah-gib-37.png');
 
 		this.game.load.image('doodad01', 'assets/background-doodad-01.png');
 		this.game.load.image('doodad02', 'assets/background-doodad-02.png');
