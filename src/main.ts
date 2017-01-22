@@ -176,18 +176,18 @@ class SimpleGame {
 
 
 		this.foodEatenCount = 0;
-		//add eyes
-		// const eyeDistance = 1;
-		// this.eyes = [];
-		// for (var i = 0; i < 3; i++) {
-		// 	// i eye captain
-		// 	let x = Math.sin(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
-		// 	let y = Math.cos(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
-		// 	console.log(`eye ${i}, ${x}:${y}`);
-		// 	let eye = new Eye(this.game, x, y);
-		// 	eye.attach(this.mouthGod);
-		// 	this.eyes.push(eye);
-		// }
+		// add eyes
+		const eyeDistance = 45;
+		this.eyes = [];
+		for (var i = 0; i < 3; i++) {
+			// i eye captain
+			let x = Math.sin(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
+			let y = Math.cos(2 * Math.PI * (i / 3) + 2 * Math.PI / 6) * eyeDistance;
+			console.log(`eye ${i}, ${x}:${y}`);
+			let eye = new Eye(this.game, x, y);
+			eye.attach(this.playerBody);
+			this.eyes.push(eye);
+		}
 
 		// add mouth-lips
 		// this.mouthLips = this.game.make.image(0, 0, "mouth-bite1");
@@ -508,7 +508,7 @@ class SimpleGame {
 		}
 
 		// this.mouthLips.rotation = -this.mouthLips.parent.rotation; // always up
-		// this.eyes.forEach(e => e.update());
+		this.eyes.forEach(e => e.update());
 		this.armList.forEach(arm => arm.update() );
 
 		if (this.game.time.now > 12000) {
