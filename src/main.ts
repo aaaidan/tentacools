@@ -9,7 +9,7 @@ const RECOIL_DURATION_MS = 150;
 declare const dat: any;
 // const gui = new dat.GUI();
 const armsTotal = 3;
-const foodCount = 12;
+const foodCount = 24;
 const urchinCount = 7;
 const shellCount = 10;
 const maxFoodToWin = 3;
@@ -345,7 +345,15 @@ class SimpleGame {
 		this.allFood.physicsBodyType = Phaser.Physics.P2JS;
 
 		for (var i = 0; i < foodCount; i++) {
-			var food = this.allFood.create(this.game.world.randomX, this.game.world.randomY, 'food');
+			var x = this.game.world.randomX;
+			var y = this.game.world.randomY;
+
+			while (x < 350 || y  < 350) {
+				x = this.game.world.randomX;
+				y = this.game.world.randomY;
+			}
+
+			var food = this.allFood.create(x, y, 'food');
 			food.scale.setTo(0.2, 0.2);
 			food.body.setCircle(food.width / 2 * 0.8, 0, 0, 0);
 			food.body.setCollisionGroup(foodCollisionGroup);
