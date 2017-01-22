@@ -63,26 +63,26 @@ class Arm {
 			lastBall = b;
 		});
 
-		stiffness.addListener((value) => {
-			this.springs.forEach(s => {
-				s.data.stiffness = value;
-			});
-		});
-		damping.addListener((value) => {
-			this.springs.forEach(s => {
-				s.data.damping = value;
-			});
-		});
-		armLengthStiffness.addListener(value => {
-			this.hinges.forEach(h => {
-				h.setStiffness(value);
-			});
-		});
-		armLengthRelaxation.addListener(value => {
-			this.hinges.forEach(h => {
-				h.setRelaxation(value);
-			});
-		});
+		// stiffness.addListener((value) => {
+		// 	this.springs.forEach(s => {
+		// 		s.data.stiffness = value;
+		// 	});
+		// });
+		// damping.addListener((value) => {
+		// 	this.springs.forEach(s => {
+		// 		s.data.damping = value;
+		// 	});
+		// });
+		// armLengthStiffness.addListener(value => {
+		// 	this.hinges.forEach(h => {
+		// 		h.setStiffness(value);
+		// 	});
+		// });
+		// armLengthRelaxation.addListener(value => {
+		// 	this.hinges.forEach(h => {
+		// 		h.setRelaxation(value);
+		// 	});
+		// });
 		this.tip.body.force.x = Math.random() - 0.5 * 2000;
 		this.tip.body.force.y = Math.random() - 0.5 * 2000;
 	}

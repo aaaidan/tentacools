@@ -7,7 +7,7 @@ const RECOIL_FORCE = 20;
 const RECOIL_DURATION_MS = 150;
 
 declare const dat: any;
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 const armsTotal = 3;
 const foodCount = 100;
 const urchinCount = 5;
@@ -25,33 +25,33 @@ var tweaks = {
 	cameraScale: 1
 }
 
-function extendGuiParameterToSupportMultipleListeners(guiParam) {
-	guiParam.___changeCallbacks___ = [];
-	guiParam.addListener = (function (callback) {
-		this.___changeCallbacks___.push(callback);
-	}).bind(guiParam);
-	guiParam.onChange((function (val) {
-		this.___changeCallbacks___.forEach(cb => cb(val));
-	}).bind(guiParam));
-}
+// function extendGuiParameterToSupportMultipleListeners(guiParam) {
+// 	guiParam.___changeCallbacks___ = [];
+// 	guiParam.addListener = (function (callback) {
+// 		this.___changeCallbacks___.push(callback);
+// 	}).bind(guiParam);
+// 	guiParam.onChange((function (val) {
+// 		this.___changeCallbacks___.forEach(cb => cb(val));
+// 	}).bind(guiParam));
+// }
 
-var stiffness = gui.add(tweaks, 'stiffness', 1, 50);
-extendGuiParameterToSupportMultipleListeners(stiffness);
+// var stiffness = gui.add(tweaks, 'stiffness', 1, 50);
+// extendGuiParameterToSupportMultipleListeners(stiffness);
 
-var damping = gui.add(tweaks, 'damping', 1, 500);
-extendGuiParameterToSupportMultipleListeners(damping);
+// var damping = gui.add(tweaks, 'damping', 1, 500);
+// extendGuiParameterToSupportMultipleListeners(damping);
 
-var mouthMass = gui.add(tweaks, 'mouthMass', 1, 100);
+// var mouthMass = gui.add(tweaks, 'mouthMass', 1, 100);
 
-var tentacleForce = gui.add(tweaks, 'tentacleForce', 10, 500);
+// var tentacleForce = gui.add(tweaks, 'tentacleForce', 10, 500);
 
-var armLengthStiffness = gui.add(tweaks, 'armLengthStiffness', 1, 50);
-extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
+// var armLengthStiffness = gui.add(tweaks, 'armLengthStiffness', 1, 50);
+// extendGuiParameterToSupportMultipleListeners(armLengthStiffness);
 
-var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
-extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
+// var armLengthRelaxation = gui.add(tweaks, 'armLengthRelaxation', 1, 50);
+// extendGuiParameterToSupportMultipleListeners(armLengthRelaxation);
 
-var cameraScale = gui.add(tweaks, 'cameraScale', 0.5, 3);
+// var cameraScale = gui.add(tweaks, 'cameraScale', 0.5, 3);
 
 
 
@@ -182,9 +182,9 @@ class SimpleGame {
 		this.game.physics.startSystem(Phaser.Physics.P2JS);
 		this.game.camera.follow(this.playerBody);
 
-		cameraScale.onChange(scale => {
-			this.game.camera.scale.setTo(scale);
-		});
+		// cameraScale.onChange(scale => {
+		// 	this.game.camera.scale.setTo(scale);
+		// });
 
 		// Enabled physics on mouth
 		this.game.physics.p2.enable([this.playerBody, this.mouthGod], SHOW_PHYSICS_DEBUG);
