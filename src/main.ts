@@ -63,6 +63,9 @@ class SimpleGame {
 	game: Phaser.Game;
 
 	title: Phaser.Sprite;
+	success: Phaser.Sprite;
+	controls: Phaser.Sprite;
+	instructions: Phaser.Sprite;
 
 	mouthGod: Phaser.Sprite;
 	mouthGodEatAnimation: Phaser.Animation;
@@ -135,6 +138,11 @@ class SimpleGame {
 		this.game.load.spritesheet('mouth', 'assets/mouth-spritesheet.png', 173, 178);
 
 		this.game.load.image('title', 'assets/title.png');
+
+		this.game.load.image('success', 'assets/screen_success-alt.png');
+		this.game.load.image('controls', 'assets/screen_controls.png');
+		this.game.load.image('instructions', 'assets/screen_instructions.png');
+
 	}
 
 	create() {
@@ -339,7 +347,7 @@ class SimpleGame {
 		var shellGroup = this.game.add.group();
 		shellGroup.enableBody = true;
 		shellGroup.physicsBodyType = Phaser.Physics.P2JS;
-
+ 
 		for (let i = 0; i < shellCount; i++) {
 			var shell = shellGroup.create(this.game.world.randomX, this.game.world.randomY, 'shell');
 			shell.scale.setTo(0.55);
@@ -354,6 +362,18 @@ class SimpleGame {
 		this.title.scale.set(0.8);
 		this.title.fixedToCamera = true;
 
+		// instructions
+		this.instructions = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "instructions");
+		this.instructions.pivot.set(this.instructions.width / 2, this.instructions.height / 2);
+		this.instructions.scale.set(0.8);
+		this.instructions.alpha = 0;
+
+		// controls
+		this.controls = this.game.add.sprite(this.game.width / 2, this.game.height / 2, "controls");
+		this.controls.pivot.set(this.controls.width / 2, this.controls.height / 2);
+		this.controls.scale.set(0.8);
+		this.controls.alpha = 0;
+
 		// Sort out z-index of important items
 		this.playerBody.bringToTop();
 		this.title.bringToTop();
@@ -365,10 +385,34 @@ class SimpleGame {
 
 		// Hide title screen after a while
 		// Feel free to delete this or move it somewhere else somehow
-		if (this.title && this.game.time.now > 1000) {
+		if (this.title && this.game.time.now > 3000) {
 			this.title.alpha -= 0.05;
 			if (this.title.alpha < 0) {
 				this.game.world.removeChild(this.title);
+				
+				this.title = null;
+				this.instructions.alpha = 1;
+				this.instructions.fixedToCamera = true;
+				this.instructions.bringToTop();
+			}
+		}
+
+		if (!this.title && this.instructions && this.game.time.now > 7000) {
+			this.instructions.alpha -= 0.05;
+			if (this.instructions.alpha < 0) {
+				this.game.world.removeChild(this.instructions)
+				this.instructions = null;
+				this.controls.alpha = 1;
+				this.controls.fixedToCamera = true;
+				this.controls.bringToTop();
+			}
+		}
+
+		if (!this.instructions && this.controls && this.game.time.now > 12000) {
+			this.controls.alpha -= 0.05;
+			if (this.controls.alpha < 0) {
+				this.game.world.removeChild(this.controls);
+				this.controls = null;
 			}
 		}
 
@@ -409,7 +453,6 @@ class SimpleGame {
 				yForce += result.y;
 			}
 			if (this.urchinReaction) {
-				console.log("recoilin");
 				let result = anglise(tip, Math.PI * 3 / 2, forceAmt * RECOIL_FORCE);
 				xForce += result.x;
 				yForce += result.y;
